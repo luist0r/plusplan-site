@@ -3,695 +3,448 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlusPlan: Asesoría Política y Estratégica con Visión Tecnológica</title>
-    <!-- Tailwind CSS CDN para estilos rápidos y responsivos -->
+    <title>Misión Argentina | PLUSPLAN</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN para gráficos interactivos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts - Inter para la tipografía -->
+    <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Estilos base para el cuerpo y colores personalizados de la marca */
+        /* Definición de colores de marca PlusPlan */
+        :root {
+            --plus-dark: #030C1D;
+            --plus-yellow: #FFBB00;
+        }
         body {
-            background-color: #030C1D; /* Azul oscuro principal */
-            color: #FFFFFF; /* Texto blanco por defecto */
-            font-family: 'Inter', sans-serif; /* Fuente Inter */
+            font-family: 'Inter', sans-serif;
+            background-color: var(--plus-dark);
+            color: white;
+            overflow-x: hidden;
         }
-        /* Clases de color Tailwind personalizadas */
-        .bg-primary-dark { background-color: #030C1D; }
-        .bg-accent-yellow { background-color: #FFBB00; } /* Amarillo de acento */
-        .text-accent-yellow { color: #FFBB00; }
-        .border-accent-yellow { border-color: #FFBB00; }
-        .bg-accent-red { background-color: #F40000; } /* Rojo de acento */
-        .text-accent-red { color: #F40000; }
-
-        /* Espaciado responsivo para secciones */
-        .section-padding {
-            padding: 4rem 1.5rem; /* Padding por defecto para móviles */
+        /* Efecto de texto con borde para estilo moderno */
+        .stroke-text {
+            -webkit-text-stroke: 1px rgba(255, 187, 0, 0.3);
+            color: transparent;
         }
-        @media (min-width: 768px) {
-            .section-padding {
-                padding: 6rem 2rem; /* Mayor padding en pantallas más grandes */
+        @media (min-width: 1024px) {
+            .stroke-text {
+                -webkit-text-stroke: 2px rgba(255, 187, 0, 0.3);
             }
         }
-
-        /* Contenedores de gráficos para asegurar dimensiones responsivas */
-        .chart-container {
-            position: relative;
-            margin: auto;
-            height: 320px;
+        /* Personalización de scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #01060f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--plus-yellow);
+            border-radius: 10px;
+        }
+        /* Contenedores para animaciones de Scroll Horizontal */
+        .itinerary-section {
+            overflow: hidden;
             width: 100%;
-            max-width: 450px; /* Ancho máximo para mantener la legibilidad */
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-                max-width: 500px;
-            }
-        }
-
-        /* Estilos para el diagrama de flujo (Campaign Boot Camp) */
-        .flowchart-step {
             position: relative;
-            padding-left: 2.5rem; /* Espacio para el punto y la línea */
-            padding-bottom: 2.5rem; /* Espacio entre pasos */
-            border-left: 3px solid #FFBB00; /* Línea vertical de acento */
         }
-        .flowchart-step:last-child {
-            border-left: 3px solid transparent; /* Elimina la línea en el último paso */
+        .itinerary-wrapper {
+            display: flex;
+            flex-wrap: nowrap;
+            width: max-content;
         }
-        .flowchart-dot {
+        /* Clases base para animaciones de revelado */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        .mask-reveal {
+            clip-path: inset(100% 0 0 0);
+        }
+        /* Overlay de bandera argentina sutil y elegante */
+        .flag-overlay {
+            background: linear-gradient(to bottom,
+                    rgba(3, 12, 29, 0.75) 0%,
+                    rgba(117, 192, 255, 0.08) 35%,
+                    rgba(255, 255, 255, 0.05) 50%,
+                    rgba(117, 192, 255, 0.08) 65%,
+                    rgba(3, 12, 29, 1) 100%);
+        }
+        .image-container {
+            overflow: hidden;
+            position: relative;
+            background: #0a111f;
+        }
+        /* Estilo para los contenedores de video YouTube Shorts */
+        .video-container {
+            position: relative;
+            padding-bottom: 177.77%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0a0e1a 100%);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        /* Botón para ver en YouTube */
+        .youtube-link {
             position: absolute;
-            left: -0.8rem; /* Posiciona el punto sobre la línea */
             top: 0;
-            width: 1.5rem;
-            height: 1.5rem;
-            border-radius: 9999px; /* Hace el punto circular */
-            background-color: #FFBB00; /* Color del punto */
-            border: 3px solid #030C1D; /* Borde para que resalte sobre el fondo */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(255, 187, 0, 0.1) 0%, rgba(3, 12, 29, 0.8) 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            cursor: pointer;
+            border: 2px solid rgba(255, 187, 0, 0.2);
         }
-
-        /* Estilos para el spinner de carga (se mantiene por si se usa en otro lugar o se reintroduce) */
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3); /* Color base del spinner */
-            border-top: 4px solid #FFBB00; /* Color de la parte animada */
-            border-radius: 50%; /* Forma circular */
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite; /* Animación de giro */
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
+        .youtube-link:hover {
+            background: linear-gradient(135deg, rgba(255, 187, 0, 0.2) 0%, rgba(3, 12, 29, 0.9) 100%);
+            border-color: rgba(255, 187, 0, 0.5);
+            transform: scale(1.02);
         }
-        /* Definición de la animación de giro */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .youtube-link:hover .play-icon {
+            transform: scale(1.1);
+            background: #FFBB00;
+        }
+        .play-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 187, 0, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 187, 0, 0.3);
+        }
+        .play-icon::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 24px solid #030C1D;
+            border-top: 14px solid transparent;
+            border-bottom: 14px solid transparent;
+            margin-left: 6px;
+        }
+        .youtube-text {
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-style: italic;
+        }
+        .youtube-subtext {
+            color: rgba(255, 187, 0, 0.8);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-top: 0.5rem;
+        }
+        .zoom-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
     </style>
 </head>
-<body class="bg-primary-dark">
-
-    <!-- Encabezado de la página con navegación y botón de contacto -->
-    <header class="bg-primary-dark/80 backdrop-blur-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-accent-yellow">PLUS<span class="text-white">PLAN</span></h1>
-            <a href="#contact" class="bg-accent-yellow text-primary-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition-colors">Contacto</a>
-        </nav>
-    </header>
-
-    <main>
-        <!-- Sección Hero: Introducción principal y llamado a la acción -->
-        <section id="hero" class="min-h-screen flex items-center section-padding bg-cover bg-center" style="background-image: linear-gradient(rgba(3, 12, 29, 0.8), rgba(3, 12, 29, 1)), url('https://placehold.co/1200x800/030C1D/FFFFFF?text=Visión+Estratégica');">
-            <div class="container mx-auto text-center">
-                <h1 class="text-4xl md:text-6xl font-black text-white leading-tight mb-4">Asesoría Política y Estratégica con <span class="text-accent-yellow">Visión Tecnológica</span></h1>
-                <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">Transformamos el liderazgo y la gestión pública para un impacto real, integrando estrategia, tecnología y comunicación.</p>
-                <div class="flex justify-center gap-4">
-                    <a href="#services" class="bg-accent-yellow text-primary-dark font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-400 transition-colors">Nuestros Servicios</a>
-                    <a href="#contact" class="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-white hover:text-primary-dark transition-colors">Solicitar Asesoría</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección Filosofía: Pilares de la empresa -->
-        <section id="philosophy" class="section-padding">
-            <div class="container mx-auto">
-                <div class="text-center mb-12">
-                     <h2 class="text-3xl md:text-4xl font-bold">Innovación y Percepción para el Liderazgo del Mañana</h2>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8 text-center">
-                    <div class="bg-gray-800/20 p-8 rounded-lg">
-                        <span class="text-5xl text-accent-yellow">&#128187;</span> <!-- Icono de laptop/tecnología -->
-                        <h3 class="text-2xl font-bold my-4">La Tecnología es el Presente</h3>
-                        <p>Te ayudamos a diagnosticar y aprovechar todo el potencial tecnológico para tus objetivos.</p>
-                    </div>
-                    <div class="bg-gray-800/20 p-8 rounded-lg">
-                        <span class="text-5xl text-accent-yellow">&#128065;</span> <!-- Icono de ojo/percepción -->
-                        <h3 class="text-2xl font-bold my-4">No Basta con Tener Razón</h3>
-                        <p>Construimos y proyectamos tu visión con intención, inteligencia y una imagen que es tu estrategia más poderosa.</p>
-                    </div>
-                    <div class="bg-gray-800/20 p-8 rounded-lg">
-                        <span class="text-5xl text-accent-yellow">&#129504;</span> <!-- Icono de cerebro/coherencia -->
-                        <h3 class="text-2xl font-bold my-4">Una Imagen Coherente</h3>
-                        <p>Transformamos el liderazgo ayudándote a construir una narrativa sólida y una imagen creíble que resuene.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección Servicios: Detalle de las ofertas de PlusPlan -->
-        <section id="services" class="section-padding bg-gray-900/40">
-            <div class="container mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold">Servicios Integrales de PlusPlan</h2>
-                    <p class="mt-4 max-w-2xl mx-auto">Ofrecemos una gama completa de asesorías diseñadas para optimizar tu impacto, combinando experiencia política con vanguardia tecnológica.</p>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="bg-primary-dark p-8 rounded-lg shadow-lg">
-                        <h3 class="text-xl font-bold text-accent-yellow mb-3">Inteligencia Artificial y Software</h3>
-                        <p class="mb-4">Potenciamos tu gestión con herramientas digitales avanzadas.</p>
-                        <ul class="list-disc list-inside space-y-2">
-                            <li>Automatización de tareas</li>
-                            <li>Chatbots personalizados 24/7</li>
-                            <li>Dashboards inteligentes</li>
-                            <li>Integración de sistemas</li>
-                        </ul>
-                    </div>
-                    <div class="bg-primary-dark p-8 rounded-lg shadow-lg">
-                        <h3 class="text-xl font-bold text-accent-yellow mb-3">Imagen y Marketing Político</h3>
-                        <p class="mb-4">Construimos y posicionamos tu marca para conectar eficazmente.</p>
-                        <ul class="list-disc list-inside space-y-2">
-                            <li>Narrativas de impacto</li>
-                            <li>Diagnóstico de imagen pública</li>
-                            <li>Producción de contenido con visión</li>
-                            <li>Análisis de opinión pública</li>
-                        </ul>
-                    </div>
-                    <div class="bg-primary-dark p-8 rounded-lg shadow-lg md:col-span-2 lg:col-span-1">
-                        <h3 class="text-xl font-bold text-accent-yellow mb-3">Imagen Pública para Candidatos</h3>
-                        <p class="mb-4">Posicionamos tu nombre, historia y visión para que te escuchen y crean.</p>
-                        <ul class="list-disc list-inside space-y-2">
-                            <li>Diagnóstico de percepción</li>
-                            <li>Construcción de narrativa</li>
-                            <li>Producción audiovisual</li>
-                            <li>Estrategias de redes y medios</li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- Gráfico de distribución de clientes -->
-                <div class="mt-16 text-center">
-                    <h3 class="text-2xl font-bold mb-4">Nuestra Distribución de Clientes</h3>
-                    <p class="max-w-2xl mx-auto mb-8">Brindamos soluciones a medida para un espectro diverso de líderes y organizaciones que buscan generar un cambio positivo.</p>
-                    <div class="chart-container">
-                        <canvas id="clientDonutChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección Campaign Boot Camp: Programa de formación -->
-        <section id="bootcamp" class="section-padding">
-            <div class="container mx-auto">
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <h2 class="text-3xl md:text-4xl font-bold mb-4">Campaign Boot Camp: <span class="text-accent-yellow">Guía para Formar Liderazgos</span></h2>
-                        <p class="mb-6">Una experiencia intensiva y práctica basada en la visión de Cristina Pelosi. Te equipamos con las herramientas y estrategias para navegar el complejo panorama político y social actual.</p>
-                        <!-- Diagrama de flujo de módulos -->
-                        <div class="flowchart">
-                            <div class="flowchart-step">
-                                <div class="flowchart-dot"></div>
-                                <h4 class="font-bold text-lg">Módulo 1: Fundamentos Estratégicos</h4>
-                                <p class="text-gray-400">Desarrollo de una visión clara y una narrativa auténtica.</p>
-                            </div>
-                            <div class="flowchart-step">
-                                <div class="flowchart-dot"></div>
-                                <h4 class="font-bold text-lg">Módulo 2: Comunicación de Impacto</h4>
-                                <p class="text-gray-400">Técnicas de oratoria, debate y manejo de medios.</p>
-                            </div>
-                             <div class="flowchart-step">
-                                <div class="flowchart-dot"></div>
-                                <h4 class="font-bold text-lg">Módulo 3: Tecnología para Campañas</h4>
-                                <p class="text-gray-400">Uso de datos, IA y herramientas digitales para la gestión.</p>
-                            </div>
-                            <div class="flowchart-step">
-                                <div class="flowchart-dot"></div>
-                                <h4 class="font-bold text-lg">Módulo 4: Liderazgo y Acción</h4>
-                                <p class="text-gray-400">Implementación de un plan de acción y movilización.</p>
-                            </div>
-                        </div>
-                         <div class="mt-8">
-                            <a href="#contact" class="bg-accent-red text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-red-700 transition-colors">Inscríbete Ahora</a>
-                        </div>
-                        <!-- Sección de IA para generar consejos de liderazgo (ELIMINADA) -->
-                        <!-- <div class="mt-8 p-6 bg-gray-800/20 rounded-lg">
-                            <h4 class="text-xl font-bold mb-4">Genera un Consejo de Liderazgo ✨</h4>
-                            <textarea id="leadershipGoalInput" placeholder="Describe tu objetivo de liderazgo (ej: 'quiero mejorar mi comunicación pública')" rows="3" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-accent-yellow mb-4"></textarea>
-                            <button id="generateLeadershipTipBtn" class="bg-accent-yellow text-primary-dark font-bold py-2 px-6 rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-center">
-                                <span id="leadershipTipSpinner" class="spinner hidden"></span>
-                                Generar Consejo
-                            </button>
-                            <div id="leadershipTipOutput" class="mt-4 p-3 bg-gray-700 rounded-lg hidden"></div>
-                        </div> -->
-                    </div>
-                    <!-- Gráfico de radar de foco de servicios por cliente -->
-                    <div class="text-center">
-                         <h3 class="text-2xl font-bold mb-4">Foco de Nuestros Servicios por Cliente</h3>
-                         <p class="max-w-2xl mx-auto mb-8">Cada tipo de cliente tiene necesidades únicas. Así adaptamos nuestra experiencia para maximizar su impacto.</p>
-                        <div class="chart-container">
-                            <canvas id="servicesRadarChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección Por Qué PlusPlan: Ventajas competitivas -->
-        <section id="why" class="section-padding bg-gray-900/40">
-            <div class="container mx-auto">
-                 <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold">¿Por Qué PlusPlan es Tu Aliado Estratégico?</h2>
-                </div>
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                     <div>
-                        <ul class="space-y-6">
-                            <li class="flex items-start">
-                                <span class="text-2xl text-accent-yellow mr-4 mt-1">&#10003;</span>
-                                <div>
-                                    <h4 class="font-bold text-lg">Experiencia Comprobada</h4>
-                                    <p class="text-gray-400">Años de trayectoria asesorando a líderes y organizaciones.</p>
-                                </div>
-                            </li>
-                             <li class="flex items-start">
-                                <span class="text-2xl text-accent-yellow mr-4 mt-1">&#10003;</span>
-                                <div>
-                                    <h4 class="font-bold text-lg">Innovación Constante</h4>
-                                    <p class="text-gray-400">Integración de las últimas tendencias en IA y software.</p>
-                                </div>
-                            </li>
-                             <li class="flex items-start">
-                                <span class="text-2xl text-accent-yellow mr-4 mt-1">&#10003;</span>
-                                <div>
-                                    <h4 class="font-bold text-lg">Resultados Medibles</h4>
-                                    <p class="text-gray-400">Enfoque en estrategias que generan impacto real y cuantificable.</p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- Gráfico polar de visión 360 -->
-                    <div class="text-center">
-                        <h3 class="text-2xl font-bold mb-4">Componentes de Nuestra Visión 360°</h3>
-                        <p class="max-w-2xl mx-auto mb-8">"Desde el cielo lo vemos todo". Nuestra metodología integra múltiples fuentes de inteligencia para una comprensión completa del entorno.</p>
-                        <div class="chart-container">
-                            <canvas id="visionPolarChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección Testimonios: Citas de clientes satisfechos -->
-        <section id="testimonials" class="section-padding">
-            <div class="container mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold">Historias de Éxito con PlusPlan</h2>
-                    <p class="mt-4 max-w-2xl mx-auto">La mejor prueba de nuestro impacto son los resultados de nuestros clientes.</p>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                     <div class="bg-gray-800/20 p-8 rounded-lg text-center">
-                        <p class="italic mb-4">"Gracias a PlusPlan, nuestra campaña alcanzó una conexión sin precedentes con los votantes. Su enfoque tecnológico marcó la diferencia."</p>
-                        <p class="font-bold text-accent-yellow">Candidato Municipal</p>
-                        <p class="text-sm text-gray-400">Elecciones 2024</p>
-                    </div>
-                    <div class="bg-gray-800/20 p-8 rounded-lg text-center">
-                        <p class="italic mb-4">"El Campaign Boot Camp fue una revelación. Las herramientas y la guía de Cristina Pelosi son invaluables para cualquier líder."</p>
-                        <p class="font-bold text-accent-yellow">Líder de ONG</p>
-                        <p class="text-sm text-gray-400">Sector Desarrollo Social</p>
-                    </div>
-                    <div class="bg-gray-800/20 p-8 rounded-lg text-center">
-                        <p class="italic mb-4">"La implementación de sus soluciones de IA optimizó nuestros procesos, permitiéndonos ser más eficientes y transparentes."</p>
-                        <p class="font-bold text-accent-yellow">Director de Modernización</p>
-                        <p class="text-sm text-gray-400">Gobierno Local</p>
-                    </div>
-                </div>
-                <!-- Gráfico de barras de impacto medible -->
-                <div class="mt-16 text-center">
-                    <h3 class="text-2xl font-bold mb-4">Impacto Medible en Nuestros Proyectos</h3>
-                    <p class="max-w-2xl mx-auto mb-8">Nos enfocamos en generar resultados tangibles. Estos son los promedios de mejora reportados por nuestros clientes tras nuestra intervención.</p>
-                    <div class="chart-container max-w-4xl">
-                        <canvas id="impactBarChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección Contacto: Formulario de contacto -->
-        <section id="contact" class="section-padding bg-gray-900/40">
-            <div class="container mx-auto max-w-3xl text-center">
-                <h2 class="text-3xl md:text-4xl font-bold">Impulsa Tu Visión con PlusPlan</h2>
-                <p class="mt-4 mb-8">¿Listo para transformar tu estrategia? Contáctanos hoy mismo para una asesoría personalizada.</p>
-                <!-- Formulario de contacto actualizado para Formspree -->
-                <form id="contactForm" class="text-left" action="https://formspree.io/f/xanbekqq" method="POST">
-                    <div class="grid md:grid-cols-2 gap-6 mb-6">
-                        <input type="text" id="contactName" name="Nombre" placeholder="Nombre Completo" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-yellow" required>
-                        <input type="email" id="contactEmail" name="Correo" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-yellow" required>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-6 mb-6">
-                        <input type="tel" id="contactPhone" name="Teléfono" placeholder="Teléfono" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-yellow">
-                        <input type="text" id="contactOrganization" name="Organización" placeholder="Organización / Institución" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-yellow" required>
-                    </div>
-                    <div class="mb-6">
-                        <textarea id="contactMessage" name="Mensaje" placeholder="Mensaje" rows="5" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-yellow" required></textarea>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="bg-accent-yellow text-primary-dark font-bold py-3 px-12 rounded-lg text-lg hover:bg-yellow-400 transition-colors flex items-center justify-center mx-auto">
-                            <!-- Spinner de carga (se mantiene por si se usa en otro lugar o se reintroduce) -->
-                            <span id="contactSpinner" class="spinner hidden"></span>
-                            Enviar Mensaje
-                        </button>
-                        <!-- Div de salida de recomendación (ELIMINADO) -->
-                        <!-- <div id="serviceRecommendationOutput" class="mt-4 p-3 bg-gray-700 rounded-lg text-white text-left hidden"></div> -->
-                    </div>
-                </form>
-            </div>
-        </section>
-    </main>
-
-    <!-- Pie de página -->
-    <footer class="bg-primary-dark py-8">
-        <div class="container mx-auto text-center text-gray-400">
-            <p>&copy; 2025 PlusPlan. Todos los derechos reservados.</p>
-            <p class="mt-2">Email: hell@plusplan.app | Tel: +502 5413-2305</p>
-            <p class="mt-2">Guatemala</p>
-        </div>
-    </footer>
-
-    <script>
-        // Espera a que el DOM esté completamente cargado antes de ejecutar el script
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM completamente cargado. Inicializando la aplicación.');
-
-            // Configuración común para tooltips de Chart.js
-            const tooltipConfig = {
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            title: function(tooltipItems) {
-                                const item = tooltipItems[0];
-                                let label = item.chart.data.labels[item.dataIndex];
-                                if (Array.isArray(label)) {
-                                  return label.join(' ');
-                                } else {
-                                  return label;
-                                }
+<body>
+    <div id="root"></div>
+    <!-- Dependencias: React, Babel, GSAP -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script type="text/babel">
+        const { useEffect, useRef } = React;
+        const App = () => {
+            const containerRef = useRef(null);
+            const heroRef = useRef(null);
+            const obeliskRef = useRef(null);
+            const wrapperRef = useRef(null);
+            const sectionRef = useRef(null);
+            const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeWXuLugGnD2mYAP0BiX2w12YMY5cNuIERa5rpre2NzewzR6g/viewform?usp=sharing&ouid=117520435115374207815";
+            useEffect(() => {
+                gsap.registerPlugin(ScrollTrigger);
+                const ctx = gsap.context(() => {
+                    // Animación Parallax del Hero
+                    gsap.to(obeliskRef.current, {
+                        scrollTrigger: {
+                            trigger: heroRef.current,
+                            start: "top top",
+                            end: "bottom top",
+                            scrub: true
+                        },
+                        y: 150,
+                        scale: 1.05
+                    });
+                    // Revelado de textos en cascada
+                    gsap.utils.toArray('.reveal').forEach((el) => {
+                        gsap.to(el, {
+                            opacity: 1,
+                            y: 0,
+                            duration: 1,
+                            ease: "power2.out",
+                            scrollTrigger: {
+                                trigger: el,
+                                start: "top 85%"
                             }
+                        });
+                    });
+                    // Revelado de máscara para Laboratorio Urbano
+                    gsap.to('.mask-reveal', {
+                        clipPath: "inset(0% 0 0 0)",
+                        duration: 1.8,
+                        ease: "expo.inOut",
+                        scrollTrigger: {
+                            trigger: ".mask-reveal",
+                            start: "top 80%"
                         }
-                    }
-                }
-            };
-
-            // Función para envolver etiquetas largas en gráficos
-            const wrapLabel = (label, maxWidth = 16) => {
-                const words = label.split(' ');
-                let lines = [];
-                let currentLine = '';
-                words.forEach(word => {
-                    if ((currentLine + word).length > maxWidth) {
-                        lines.push(currentLine.trim());
-                        currentLine = '';
-                    }
-                    currentLine += word + ' ';
-                });
-                lines.push(currentLine.trim());
-                return lines;
-            };
-
-            // Inicialización del gráfico de donut (Distribución de Clientes)
-            console.log('Intentando inicializar clientDonutChart.');
-            const clientDonutCtx = document.getElementById('clientDonutChart');
-            if(clientDonutCtx) {
-                new Chart(clientDonutCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Candidatos Políticos', 'Gobiernos', 'ONGs con Causa Social'],
-                        datasets: [{
-                            label: 'Distribución de Clientes',
-                            data: [45, 35, 20],
-                            backgroundColor: ['#FFBB00', '#F40000', '#FFFFFF'],
-                            borderColor: '#030C1D',
-                            borderWidth: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            ...tooltipConfig.plugins, // Usa la configuración de tooltip común
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#FFFFFF',
-                                    font: { size: 14 }
-                                }
-                            }
+                    });
+                    // Animación del Itinerario Horizontal (Agenda)
+                    const wrapper = wrapperRef.current;
+                    const totalScroll = wrapper.offsetWidth - window.innerWidth;
+                    gsap.to(wrapper, {
+                        x: -totalScroll,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: sectionRef.current,
+                            pin: true,
+                            scrub: 0.8,
+                            start: "top top",
+                            end: () => `+=${totalScroll}`,
+                            invalidateOnRefresh: true
                         }
-                    }
-                });
-                console.log('clientDonutChart inicializado con éxito.');
-            } else {
-                console.error('No se encontró el elemento canvas con ID clientDonutChart.');
-            }
-
-            // Inicialización del gráfico de radar (Foco de Servicios por Cliente)
-            console.log('Intentando inicializar servicesRadarChart.');
-            const servicesRadarCtx = document.getElementById('servicesRadarChart');
-            if(servicesRadarCtx) {
-                new Chart(servicesRadarCtx, {
-                    type: 'radar',
-                    data: {
-                        labels: ['Estrategia', 'Tecnología', 'Comunicación', 'Imagen Pública', 'Análisis de Datos'],
-                        datasets: [
+                    });
+                    // Contadores dinámicos para estadísticas
+                    gsap.utils.toArray('.stat-number').forEach(stat => {
+                        const val = parseInt(stat.getAttribute('data-value'));
+                        gsap.fromTo(stat,
+                            { innerText: 0 },
                             {
-                                label: 'Candidatos',
-                                data: [8, 6, 9, 10, 7],
-                                fill: true,
-                                backgroundColor: 'rgba(255, 187, 0, 0.2)',
-                                borderColor: '#FFBB00',
-                                pointBackgroundColor: '#FFBB00',
-                            }, {
-                                label: 'Gobiernos',
-                                data: [9, 10, 6, 5, 9],
-                                fill: true,
-                                backgroundColor: 'rgba(244, 0, 0, 0.2)',
-                                borderColor: '#F40000',
-                                pointBackgroundColor: '#F40000',
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                             ...tooltipConfig.plugins,
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#FFFFFF'
+                                innerText: val,
+                                duration: 2.5,
+                                ease: "power2.out",
+                                snap: { innerText: 1 },
+                                scrollTrigger: {
+                                    trigger: stat,
+                                    start: "top 90%",
+                                    toggleActions: "play none none none"
                                 }
                             }
-                        },
-                        scales: {
-                            r: {
-                                angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
-                                grid: { color: 'rgba(255, 255, 255, 0.2)' },
-                                pointLabels: { color: '#FFFFFF', font: { size: 12 } },
-                                ticks: {
-                                    color: '#030C1D', // Color de los ticks, se hace oscuro para que resalte en el fondo claro del tick
-                                    backdropColor: 'rgba(255, 255, 255, 0.8)', // Fondo claro para los ticks
-                                    stepSize: 2
-                                }
-                            }
-                        }
-                    }
-                });
-                console.log('servicesRadarChart inicializado con éxito.');
-            } else {
-                console.error('No se encontró el elemento canvas con ID servicesRadarChart.');
-            }
-            
-            // Inicialización del gráfico polar (Visión 360°)
-            console.log('Intentando inicializar visionPolarChart.');
-            const visionPolarCtx = document.getElementById('visionPolarChart');
-            if(visionPolarCtx) {
-                new Chart(visionPolarCtx, {
-                    type: 'polarArea',
-                    data: {
-                        labels: ['Vigilancia Territorial', 'Inteligencia Visual', 'Cartografía Estratégica', 'Campañas Aéreas', 'Análisis Digital'],
-                        datasets: [{
-                            label: 'Visión 360°',
-                            data: [8, 9, 7, 6, 10],
-                            backgroundColor: [
-                                'rgba(255, 187, 0, 0.7)', /* Amarillo con transparencia */
-                                'rgba(244, 0, 0, 0.7)', /* Rojo con transparencia */
-                                'rgba(255, 255, 255, 0.7)', /* Blanco con transparencia */
-                                'rgba(255, 187, 0, 0.5)',
-                                'rgba(244, 0, 0, 0.5)'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            ...tooltipConfig.plugins,
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#FFFFFF',
-                                    font: { size: 14 },
-                                    boxWidth: 20
-                                }
-                            }
-                        },
-                        scales: {
-                            r: {
-                                grid: { color: 'rgba(255, 255, 255, 0.2)' },
-                                ticks: {
-                                    display: false // Oculta los valores de los ticks en el eje radial
-                                }
-                            }
-                        }
-                    }
-                });
-                console.log('visionPolarChart inicializado con éxito.');
-            } else {
-                console.error('No se encontró el elemento canvas con ID visionPolarChart.');
-            }
-
-            // Inicialización del gráfico de barras (Impacto Medible)
-            console.log('Intentando inicializar impactBarChart.');
-            const impactBarCtx = document.getElementById('impactBarChart');
-            if(impactBarCtx) {
-                new Chart(impactBarCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: [
-                            wrapLabel('Aumento en Percepción Positiva'), /* Envuelve etiquetas largas */
-                            wrapLabel('Optimización de Procesos Internos'), 
-                            wrapLabel('Mejora en Engagement Digital'), 
-                            wrapLabel('Eficiencia en Gestión de Campaña')
-                        ],
-                        datasets: [{
-                            label: '% de Mejora Promedio',
-                            data: [35, 50, 45, 30],
-                            backgroundColor: ['#FFBB00', '#F40000', '#FFBB00', '#F40000'], /* Colores alternados */
-                            borderRadius: 5 /* Bordes redondeados para las barras */
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y', // Hace el gráfico de barras horizontal
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            ...tooltipConfig.plugins,
-                            legend: {
-                                display: false // No mostrar leyenda para una sola serie de datos
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)' // Líneas de cuadrícula sutiles
-                                },
-                                ticks: {
-                                    color: '#FFFFFF', // Color de los ticks del eje X
-                                    callback: function(value) {
-                                        return value + '%' // Añade el signo de porcentaje a los ticks
-                                    }
-                                }
-                            },
-                            y: {
-                                grid: {
-                                    display: false // No mostrar líneas de cuadrícula en el eje Y
-                                },
-                                ticks: {
-                                    color: '#FFFFFF', // Color de los ticks del eje Y
-                                    font: {
-                                        size: 14
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-                console.log('impactBarChart inicializado con éxito.');
-            } else {
-                console.error('No se encontró el elemento canvas con ID impactBarChart.');
-            }
-
-            // Smooth scrolling para enlaces de anclaje
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault(); // Previene el comportamiento por defecto del enlace
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth' // Desplazamiento suave
+                        );
                     });
-                });
-            });
-
-            // Lógica para el formulario de contacto (solo Formspree)
-            const contactForm = document.getElementById('contactForm');
-            const contactSpinner = document.getElementById('contactSpinner');
-            // serviceRecommendationOutput y lógica de Gemini eliminadas
-
-            contactForm.addEventListener('submit', async (e) => {
-                e.preventDefault(); // Previene el envío del formulario
-                contactSpinner.classList.remove('hidden'); // Muestra el spinner
-                // serviceRecommendationOutput ya no se usa aquí
-
-                // Recopila todos los datos del formulario
-                const name = document.getElementById('contactName').value;
-                const email = document.getElementById('contactEmail').value;
-                const phone = document.getElementById('contactPhone').value;
-                const organization = document.getElementById('contactOrganization').value;
-                const message = document.getElementById('contactMessage').value;
-
-                // Validación básica de campos requeridos
-                if (!name || !email || !message || !organization) {
-                    // Si se desea mostrar un mensaje de error, se necesitaría un div para ello
-                    alert('Por favor, completa todos los campos obligatorios (Nombre, Correo, Mensaje, Organización).'); // Usando alert temporalmente
-                    contactSpinner.classList.add('hidden');
-                    return;
-                }
-
-                // --- Acción: Enviar datos a Formspree (para recibir el correo) ---
-                // IMPORTANTE: Reemplaza 'YOUR_FORMSPREE_ID' con el ID de tu formulario de Formspree.
-                // Visita https://formspree.io/ para obtener tu ID y configurar tu email.
-                try {
-                    const response = await fetch(contactForm.action, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: name,
-                            email: email,
-                            phone: phone,
-                            organization: organization,
-                            message: message
-                        })
-                    });
-
-                    if (response.ok) {
-                        alert('¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.'); // Usando alert temporalmente
-                        contactForm.reset(); // Limpia el formulario
-                    } else {
-                        const errorData = await response.json();
-                        alert(`Error al enviar el mensaje: ${errorData.error || response.statusText}`); // Usando alert temporalmente
-                        console.error('Error al enviar el formulario a Formspree:', response.status, errorData);
-                    }
-                } catch (error) {
-                    alert(`Ocurrió un error de red: ${error.message}`); // Usando alert temporalmente
-                    console.error('Error de red al enviar el formulario:', error);
-                } finally {
-                    contactSpinner.classList.add('hidden'); // Oculta el spinner
-                }
-            });
-
-            // Lógica para generar consejos de liderazgo (SECCIÓN ELIMINADA)
-            /*
-            const generateLeadershipTipBtn = document.getElementById('generateLeadershipTipBtn');
-            const leadershipGoalInput = document.getElementById('leadershipGoalInput');
-            const leadershipTipSpinner = document.getElementById('leadershipTipSpinner');
-            const leadershipTipOutput = document.getElementById('leadershipTipOutput');
-
-            generateLeadershipTipBtn.addEventListener('click', async () => {
-                // ... lógica de IA eliminada ...
-            });
-            */
-        });
+                }, containerRef);
+                return () => ctx.revert();
+            }, []);
+            return (
+                <div ref={containerRef}>
+                    {/* Navegación Estilo PlusPlan */}
+                    <nav className="fixed w-full z-[100] px-6 py-4 flex justify-between items-center bg-[#030C1D]/85 backdrop-blur-lg border-b border-white/5">
+                        <div className="flex items-center gap-2">
+                            {/* El Logo redirige a la raíz del sitio principal */}
+                            <a href="/" className="text-xl font-bold text-[#FFBB00]">PLUS<span className="text-white">PLAN</span></a>
+                        </div>
+                        <div className="hidden lg:flex gap-10 text-[10px] font-black tracking-[0.2em] uppercase opacity-60">
+                            {/* Ajustado para volver al Home de plusplan.app */}
+                            <a href="/" className="hover:text-[#FFBB00] transition-colors">Inicio</a>
+                            <a href="#mision" className="hover:text-[#FFBB00] transition-colors">La Misión</a>
+                            <a href="#destinatarios" className="hover:text-[#FFBB00] transition-colors">Destinatarios</a>
+                            <a href="#itinerario" className="hover:text-[#FFBB00] transition-colors">Agenda</a>
+                            <a href="#liderazgo" className="hover:text-[#FFBB00] transition-colors">Promotores</a>
+                        </div>
+                        <a href={FORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#FFBB00] text-[#030C1D] px-8 py-2.5 rounded-lg text-xs font-black uppercase hover:bg-yellow-400 transition-all shadow-lg shadow-yellow-500/10">
+                            RESERVAR CUPO
+                        </a>
+                    </nav>
+                    {/* Portada Hero con Obelisco Nocturno */}
+                    <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
+                        <div
+                            ref={obeliskRef}
+                            className="absolute inset-0 bg-cover bg-center parallax-bg"
+                            style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=1920&q=80")' }}
+                        >
+                            <div className="absolute inset-0 flag-overlay"></div>
+                        </div>
+                        <div className="relative z-10 text-center px-6 mt-16">
+                            <h2 className="text-[#FFBB00] font-black tracking-[0.4em] uppercase text-[10px] md:text-xs mb-8 reveal italic">Misión Estratégica Internacional</h2>
+                            <h1 className="text-6xl md:text-[11rem] font-black uppercase italic leading-[0.82] tracking-tighter drop-shadow-2xl">
+                                <span className="block reveal">Misión</span>
+                                <span className="block stroke-text reveal">Argentina</span>
+                            </h1>
+                            <p className="max-w-xl mx-auto mt-12 text-lg md:text-2xl opacity-70 font-light reveal leading-relaxed italic text-white">
+                                "Innovación y Smart Cities en el hub tecnológico más resiliente de Latinoamérica."
+                            </p>
+                        </div>
+                    </section>
+                    {/* Sección Laboratorio Urbano */}
+                    <section id="mision" className="py-32 px-6 max-w-7xl mx-auto overflow-hidden">
+                        <div className="grid lg:grid-cols-2 gap-24 items-center">
+                            <div className="reveal">
+                                <h2 className="text-5xl md:text-7xl font-black uppercase italic leading-none mb-12 text-white text-white">Laboratorio<br /><span className="text-[#FFBB00]">Urbano</span></h2>
+                                <p className="text-xl text-gray-400 font-light leading-relaxed mb-12 italic">
+                                    Argentina posee un ecosistema científico-tecnológico que impulsa unicornios globales y sirve como el escenario ideal para observar la gestión de la complejidad territorial.
+                                </p>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="p-8 rounded-2xl bg-white/5 border border-white/10 group hover:border-[#FFBB00]/30 transition-all text-center">
+                                        <span className="text-6xl font-black text-[#FFBB00] stat-number" data-value="46">0</span>
+                                        <span className="block text-[10px] uppercase tracking-widest font-bold mt-2 opacity-40">Millones hab.</span>
+                                    </div>
+                                    <div className="p-8 rounded-2xl bg-white/5 border border-white/10 group hover:border-[#FFBB00]/30 transition-all text-center">
+                                        <span className="text-6xl font-black text-[#FFBB00] stat-number" data-value="11">0</span>
+                                        <span className="block text-[10px] uppercase tracking-widest font-bold mt-2 opacity-40">Unicornios</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="relative">
+                                <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FFBB00]/10 blur-[100px] rounded-full"></div>
+                                <div className="mask-reveal image-container rounded-[2.5rem] aspect-square shadow-[0_0_50px_rgba(255,187,0,0.1)]">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80"
+                                        className="zoom-img grayscale contrast-125 brightness-90"
+                                        alt="Buenos Aires Puerto Madero"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    {/* Sección Destinatarios */}
+                    <section id="destinatarios" className="py-32 px-6 bg-white text-black relative">
+                        <div className="max-w-7xl mx-auto text-center mb-24 reveal">
+                            <h2 className="text-5xl md:text-[6rem] font-black uppercase italic leading-none tracking-tighter">A quién está<br />dirigido</h2>
+                        </div>
+                        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
+                            {[
+                                { t: "Sector Público", d: "Alcaldes, ministros y funcionarios que lideran procesos de modernización y ciudades inteligentes." },
+                                { t: "Sector Privado", d: "CEOs y directores de innovación de empresas vinculadas al desarrollo territorial y tecnología aplicada." },
+                                { t: "Sociedad Civil", d: "Planificadores, investigadores y líderes de organizaciones interesados en modelos urbanos de éxito." }
+                            ].map((perfil, i) => (
+                                <div key={i} className="reveal p-10 border-l-4 border-black hover:bg-gray-100 transition-colors">
+                                    <h3 className="text-3xl font-black uppercase italic mb-6 leading-tight tracking-tighter">{perfil.t}</h3>
+                                    <p className="text-gray-600 font-light text-lg leading-relaxed italic">{perfil.d}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                    {/* Agenda Deslizable Horizontal */}
+                    <section ref={sectionRef} className="itinerary-section h-screen bg-[#01060f] flex items-center border-y border-white/5">
+                        <div ref={wrapperRef} className="itinerary-wrapper">
+                            <div className="w-[100vw] md:w-[45vw] flex-shrink-0 flex flex-col justify-center px-12 lg:px-24">
+                                <h2 className="text-6xl md:text-[8rem] font-black uppercase italic leading-none mb-8 tracking-tighter text-white">Agenda de<br /><span className="text-[#FFBB00]">Inmersión</span></h2>
+                                <p className="text-xl opacity-40 font-light max-sm italic text-white/80">Desliza para explorar la ruta técnica paso a paso.</p>
+                            </div>
+                            {[
+                                { d: "Día 1", t: "Arribo y Contexto", desc: "Presentación estratégica en el corazón de Buenos Aires.", img: "https://images.unsplash.com/photo-1612294037637-ec328d0e075e?auto=format&fit=crop&w=1200&q=80" },
+                                { d: "Día 2", t: "Gestión Urbana", desc: "Visita al Centro de Monitoreo Urbano y políticas digitales.", img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80" },
+                                { d: "Día 3", t: "AMBA e Industria", desc: "Recorrido por municipios clave y parques industriales.", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80" },
+                                { d: "Día 4", t: "Networking Tech", desc: "Encuentro con unicornios y laboratorios abiertos.", img: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80" },
+                                { d: "Día 5", t: "Legado y Cierre", desc: "Taller de replicabilidad y conclusiones finales.", img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80" }
+                            ].map((item, i) => (
+                                <div key={i} className="itinerary-card w-[90vw] md:w-[60vw] flex-shrink-0 px-8 relative">
+                                    <div className="h-[75vh] rounded-[3rem] overflow-hidden relative group border border-white/10 bg-[#0a111f]">
+                                        <img src={item.img} className="absolute inset-0 w-full h-full object-cover grayscale brightness-[0.4] group-hover:scale-105 transition-transform duration-1000" alt={item.t} />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                                        <div className="relative h-full p-12 md:p-16 flex flex-col justify-between z-10 text-white">
+                                            <div>
+                                                <span className="text-[#FFBB00] font-black tracking-widest uppercase text-sm mb-4 block italic">{item.d}</span>
+                                                <h3 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-tight">{item.t}</h3>
+                                            </div>
+                                            <p className="text-xl md:text-2xl opacity-70 font-light leading-relaxed italic max-w-lg">"{item.desc}"</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                    {/* Llamado a la Acción e Inversión */}
+                    <section className="py-40 text-center bg-[#FFBB00] relative overflow-hidden text-[#030C1D]">
+                        <div className="relative z-10 max-w-5xl mx-auto px-6 reveal">
+                            <h2 className="text-2xl font-black uppercase tracking-[0.4em] mb-4 italic leading-none">Inversión del Programa</h2>
+                            <span className="text-7xl md:text-[13rem] font-black italic block mb-12 leading-none tracking-tighter uppercase">US$ 4.500</span>
+                            <p className="opacity-60 font-bold uppercase tracking-[0.3em] text-xs mb-16 italic">+ IVA por asistente • Cupos Limitados por Edición</p>
+                            <a href={FORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#030C1D] text-white px-20 py-7 rounded-lg font-black text-2xl uppercase tracking-tighter hover:scale-105 transition-all inline-block shadow-2xl hover:bg-black">
+                                RESERVAR MI CUPO
+                            </a>
+                        </div>
+                    </section>
+                    {/* Sección Promotores de la Misión (Videos Shorts) */}
+                    <section id="liderazgo" className="py-32 px-6 max-w-7xl mx-auto border-t border-white/5 text-white">
+                        <div className="text-center mb-24 reveal">
+                            <h2 className="text-5xl md:text-[6rem] lg:text-[7rem] font-black uppercase italic leading-none tracking-tighter">Promotores de<br /><span className="text-[#FFBB00]">la Misión</span></h2>
+                            <p className="mt-8 text-xl font-light opacity-50 italic">"Liderazgo con visión tecnológica y territorial"</p>
+                        </div>
+                        <div className="grid lg:grid-cols-2 gap-16 lg:gap-32">
+                            {/* Luis Torres */}
+                            <div className="reveal space-y-8">
+                                <div className="video-container border border-white/10">
+                                    <a
+                                        href="https://www.youtube.com/shorts/0PDtzcAME4s"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="youtube-link"
+                                    >
+                                        <div className="play-icon"></div>
+                                        <span className="youtube-text">Ver en YouTube</span>
+                                        <span className="youtube-subtext">YouTube Short</span>
+                                    </a>
+                                </div>
+                                <div className="pt-4 text-white">
+                                    <h3 className="text-4xl font-black uppercase italic text-[#FFBB00] tracking-tighter leading-none">Lic. Luis Torres</h3>
+                                    <p className="text-xs font-black tracking-[0.3em] uppercase opacity-40 mb-6 mt-4">Fundador PLUSPLAN & FUDESOL</p>
+                                    <p className="text-gray-400 font-light text-lg leading-relaxed italic">
+                                        Estratega en innovación social y gestión de proyectos multisectoriales. Su enfoque integra la política pública y la tecnología aplicada para el desarrollo territorial.
+                                    </p>
+                                </div>
+                            </div>
+                            {/* Ignacio Argonz */}
+                            <div className="reveal space-y-8 lg:mt-32">
+                                <div className="video-container border border-white/10">
+                                    <a
+                                        href="https://www.youtube.com/shorts/dHoNtuM_lqA"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="youtube-link"
+                                    >
+                                        <div className="play-icon"></div>
+                                        <span className="youtube-text">Ver en YouTube</span>
+                                        <span className="youtube-subtext">YouTube Short</span>
+                                    </a>
+                                </div>
+                                <div className="pt-4 text-white">
+                                    <h3 className="text-4xl font-black uppercase italic text-[#FFBB00] tracking-tighter leading-none">Lic. Ignacio Argonz</h3>
+                                    <p className="text-xs font-black tracking-[0.3em] uppercase opacity-40 mb-6 mt-4">Especialista Smart Cities</p>
+                                    <p className="text-gray-400 font-light text-lg leading-relaxed italic">
+                                        Magíster en Políticas Públicas especializado en la planificación de Ciudades Inteligentes, enfocado en el desarrollo urbano sostenible y la innovación.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    {/* Footer Institucional */}
+                    <footer className="py-20 px-6 text-center bg-[#030C1D] border-t border-white/5">
+                        <div className="opacity-30 text-[10px] font-black uppercase tracking-[0.4em] mb-12 text-white">
+                            © PLUSPLAN - Misión Argentina - <a href="https://heydrop.me/luist0r" target="_blank" className="underline hover:text-[#FFBB00]">Contacto Heydrop</a>
+                        </div>
+                        <div className="flex flex-col md:flex-row justify-center gap-10 items-center opacity-60 text-white">
+                            <a href="https://plusplan.app" className="text-xs font-bold uppercase tracking-widest hover:text-[#FFBB00] transition-colors">PlusPlan.app</a>
+                            <div className="hidden md:block w-px h-4 bg-white/20"></div>
+                            <span className="text-[10px] font-black tracking-[0.2em] uppercase italic">Conocer, adoptar y adaptar</span>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
