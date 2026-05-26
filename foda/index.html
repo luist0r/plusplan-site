@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema FODA Político — PlusPlan</title>
+<link href="https://fonts.googleapis.com/css2?family=Alatsi&family=League+Spartan:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--K:#000;--Y:#FFF200;--G:#6D6E71;--L:#E6E7E8;--W:#fff;--BG:#F0F0EE}
+body{font-family:'League Spartan',sans-serif;background:var(--BG);color:var(--K);font-size:14px;line-height:1.6}
+.screen{display:none}.screen.active{display:block}
+.wm{font-family:'Alatsi',sans-serif;letter-spacing:.12em;line-height:1}
+.wm-dot{color:var(--Y)}
+.wm-sub{font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-top:3px;opacity:.45}
+#login-screen{min-height:100vh;display:flex;background:var(--K)}
+.login-left{flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:44px;color:var(--W)}
+.login-right{width:360px;background:var(--W);display:flex;flex-direction:column;justify-content:center;padding:44px 40px}
+@media(max-width:680px){#login-screen{flex-direction:column}.login-left{padding:28px 24px;flex:none}.login-right{width:100%;padding:28px 24px}}
+.login-hero{padding:32px 0}
+.login-hero-tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--Y);font-weight:700;margin-bottom:14px}
+.login-hero h2{font-family:'Alatsi',sans-serif;font-size:32px;letter-spacing:.02em;line-height:1.2;margin-bottom:12px}
+.login-hero p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;max-width:300px}
+.login-right h3{font-family:'Alatsi',sans-serif;font-size:22px;letter-spacing:.03em;margin-bottom:6px}
+.login-right>p{font-size:13px;color:var(--G);margin-bottom:28px;line-height:1.5}
+.field-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--G);display:block;margin-bottom:8px}
+.code-inp{width:100%;padding:15px;border:2px solid var(--L);font-family:'Alatsi',sans-serif;font-size:22px;letter-spacing:5px;text-align:center;text-transform:uppercase;background:var(--BG);color:var(--K);outline:none;transition:border-color .15s;border-radius:2px}
+.code-inp:focus{border-color:var(--K)}.code-inp.err{border-color:#dc2626}
+.err-msg{color:#dc2626;font-size:11px;margin-top:6px;display:none}
+.btn-Y{width:100%;padding:15px;background:var(--Y);color:var(--K);border:none;border-radius:2px;font-family:'League Spartan',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:14px;transition:opacity .15s}
+.btn-Y:hover{opacity:.88}
+.login-note{font-size:11px;color:var(--G);text-align:center;margin-top:18px;letter-spacing:.03em}
+.topbar{background:var(--K);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.code-pill{background:var(--Y);color:var(--K);font-size:10px;font-weight:700;letter-spacing:.1em;padding:4px 12px;border-radius:20px}
+.prog-bar{height:2px;background:rgba(255,255,255,.1)}
+.prog-fill{height:100%;background:var(--Y);transition:width .4s ease}
+#form-screen{min-height:100vh;background:var(--BG)}
+.form-body{max-width:560px;margin:0 auto;padding:28px 20px 60px}
+.step-meta{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--G);margin-bottom:8px}
+.step-title{font-family:'Alatsi',sans-serif;font-size:28px;letter-spacing:.02em;margin-bottom:6px;line-height:1.2}
+.step-sub{font-size:13px;color:var(--G);margin-bottom:26px;line-height:1.6}
+.foda-tag{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:2px;margin-bottom:14px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.form-group{margin-bottom:20px}
+.form-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:8px;color:var(--G)}
+.form-lbl .qn{font-weight:400;color:var(--L)}
+.form-inp,.form-sel,.form-ta{width:100%;padding:12px 14px;border:1.5px solid var(--L);border-radius:2px;font-family:'League Spartan',sans-serif;font-size:14px;background:var(--W);color:var(--K);outline:none;transition:border-color .15s}
+.form-inp:focus,.form-sel:focus,.form-ta:focus{border-color:var(--K)}
+.form-ta{min-height:88px;resize:vertical;line-height:1.5}
+.div-line{height:1px;background:var(--L);margin:20px 0}
+.slider-big{font-family:'Alatsi',sans-serif;font-size:44px;text-align:center;line-height:1;margin-bottom:4px}
+.slider-sub{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--G);margin-bottom:6px}
+input[type=range]{width:100%;accent-color:var(--K);cursor:pointer}
+.yn-wrap{display:flex;gap:8px}
+.yn-btn{flex:1;padding:13px;border:1.5px solid var(--L);border-radius:2px;background:var(--W);font-family:'League Spartan',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s;color:var(--K)}
+.yn-si{border-color:var(--K)!important;background:var(--K)!important;color:var(--Y)!important}
+.yn-no{border-color:var(--G)!important;background:var(--G)!important;color:var(--W)!important}
+.mc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.mc-btn{padding:10px 12px;border:1.5px solid var(--L);border-radius:2px;background:var(--W);font-family:'League Spartan',sans-serif;font-size:12px;cursor:pointer;text-align:left;transition:all .15s;color:var(--K)}
+.mc-on{border-color:var(--K)!important;background:var(--K)!important;color:var(--Y)!important;font-weight:700}
+.nav-row{display:flex;gap:10px;margin-top:30px}
+.btn-back{flex:0 0 auto;padding:12px 20px;border:1.5px solid var(--L);background:transparent;border-radius:2px;font-family:'League Spartan',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:var(--K)}
+.btn-next{flex:1;padding:13px;background:var(--K);color:var(--W);border:none;border-radius:2px;font-family:'League Spartan',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:opacity .15s}
+.btn-next:hover{opacity:.82}
+.btn-ai{flex:1;padding:13px;background:var(--Y);color:var(--K);border:none;border-radius:2px;font-family:'League Spartan',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.load-screen{background:var(--W);border-radius:2px;padding:60px 24px;text-align:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:28px;height:28px;border:2.5px solid var(--L);border-top-color:var(--K);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:20px}
+.load-screen h2{font-family:'Alatsi',sans-serif;font-size:22px;letter-spacing:.03em;margin-bottom:8px}
+.load-screen p{font-size:13px;color:var(--G)}
+.sync-banner{background:#dcfce7;color:#166534;font-size:11px;text-align:center;padding:6px;font-weight:600;letter-spacing:.04em;display:none}
+.sync-banner.err{background:#fee2e2;color:#dc2626}
+.r-hero{background:var(--K);color:var(--W);padding:22px;border-radius:2px 2px 0 0}
+.r-hero-tag{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--Y);margin-bottom:6px;font-weight:700}
+.r-hero-name{font-family:'Alatsi',sans-serif;font-size:24px;letter-spacing:.03em;line-height:1.2;margin-bottom:4px}
+.r-hero-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.05em}
+.r-scores{display:grid;grid-template-columns:repeat(3,1fr);background:var(--W);border:1px solid var(--L);border-top:none;margin-bottom:18px}
+.rs{padding:14px 10px;text-align:center;border-right:1px solid var(--L)}
+.rs:last-child{border-right:none}
+.rs-num{font-family:'Alatsi',sans-serif;font-size:34px;line-height:1}
+.rs-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--G);margin-top:3px}
+.exec-box{background:var(--K);color:var(--W);padding:18px 20px;border-radius:2px;margin-bottom:14px;font-size:13px;line-height:1.75;border-left:4px solid var(--Y)}
+.foda-card{border:1px solid var(--L);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.foda-hdr{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--L)}
+.f-badge{width:30px;height:30px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:'Alatsi',sans-serif;font-size:15px;flex-shrink:0}
+.foda-body{padding:14px 16px;background:var(--W)}
+.foda-body p{font-size:13px;line-height:1.65;margin-bottom:10px;color:#222}
+.foda-pts{list-style:none}
+.foda-pts li{font-size:12px;color:var(--G);padding:3px 0;display:flex;gap:8px;line-height:1.4}
+.foda-pts li::before{content:'—';color:var(--K);flex-shrink:0}
+.rec-card{border:1px solid var(--L);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.rec-hdr{padding:11px 16px;border-bottom:1px solid var(--L);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:var(--BG)}
+.rec-item{display:flex;gap:14px;padding:14px 16px;border-bottom:1px solid var(--L);align-items:flex-start}
+.rec-item:last-child{border-bottom:none}
+.rec-n{font-family:'Alatsi',sans-serif;font-size:20px;color:var(--L);line-height:1;flex-shrink:0;width:22px}
+.rec-t{font-size:13px;line-height:1.6}
+.final-box{background:var(--Y);padding:18px 20px;border-radius:2px;margin-bottom:8px}
+.final-lbl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.45);margin-bottom:6px}
+.final-box p{font-size:13px;line-height:1.7}
+.powered{font-size:10px;color:var(--G);text-align:center;margin-top:14px;letter-spacing:.08em}
+#admin-screen{min-height:100vh;background:var(--BG)}
+.admin-body{max-width:640px;margin:0 auto;padding:24px 20px 60px}
+.admin-tabs{display:flex;border-bottom:2px solid var(--L);margin-bottom:24px}
+.atab{padding:11px 20px;background:transparent;border:none;font-family:'League Spartan',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--G);border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .15s}
+.atab.on{color:var(--K);border-bottom-color:var(--K)}
+.cand-card{background:var(--W);border:1px solid var(--L);border-radius:2px;padding:18px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+.cand-card:hover{border-color:var(--K)}
+.cand-name{font-family:'Alatsi',sans-serif;font-size:18px;margin-bottom:4px}
+.cand-meta{font-size:12px;color:var(--G);margin-bottom:10px}
+.mini-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.m-chip{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.06em}
+.pend-chip{background:var(--L);color:var(--G);font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px}
+.btn-sm{padding:7px 14px;border:1.5px solid rgba(255,255,255,.2);background:transparent;border-radius:2px;font-family:'League Spartan',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:var(--W)}
+.btn-sm-d{padding:7px 14px;border:1.5px solid var(--L);background:transparent;border-radius:2px;font-family:'League Spartan',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:var(--K)}
+.empty-st{text-align:center;padding:40px;color:var(--G);font-size:13px}
+.gen-box{background:var(--W);border:1px solid var(--L);border-radius:2px;padding:24px;margin-bottom:20px}
+.gen-box h3{font-family:'Alatsi',sans-serif;font-size:20px;margin-bottom:4px}
+.gen-box>p{font-size:13px;color:var(--G);margin-bottom:20px;line-height:1.5}
+.gen-result{background:var(--K);border-radius:2px;padding:22px;margin-top:18px;display:none}
+.gen-code-big{font-family:'Alatsi',sans-serif;font-size:32px;letter-spacing:6px;color:var(--Y);margin-bottom:14px;word-break:break-all}
+.copy-btn{padding:10px 22px;background:var(--Y);color:var(--K);border:none;border-radius:2px;font-family:'League Spartan',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-right:10px}
+.ch-header{display:grid;grid-template-columns:1.2fr .8fr 1fr 90px;padding:10px 16px;background:var(--BG);border-bottom:1px solid var(--L);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--G)}
+.ch-row{display:grid;grid-template-columns:1.2fr .8fr 1fr 90px;padding:12px 16px;border-bottom:1px solid var(--L);font-size:13px;align-items:center}
+.ch-row:last-child{border-bottom:none}
+.ch-code{font-family:'Alatsi',sans-serif;font-size:13px;letter-spacing:2px}
+.st-ok{background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
+.st-pend{background:var(--L);color:var(--G);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
+.gs-status{font-size:11px;padding:10px 16px;border-radius:2px;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.gs-ok{background:#dcfce7;color:#166534}
+.gs-warn{background:#fef3c7;color:#92400e}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="login-screen" class="screen active">
+  <div class="login-left">
+    <div><div class="wm" style="font-size:22px;color:#fff">PLUS<span class="wm-dot">●</span>PLAN</div><div class="wm-sub" style="color:rgba(255,255,255,.35)">Asesoría Política · plusplan.app</div></div>
+    <div class="login-hero">
+      <div class="login-hero-tag">Sistema FODA Político</div>
+      <h2>Diagnóstico integral de candidatos</h2>
+      <p>Evaluación estratégica para candidatos a Alcalde y Diputado. Fortalezas, oportunidades, debilidades, amenazas e imagen digital con IA.</p>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.08em">© 2025 PLUSPLAN · Guatemala · hell@plusplan.app · +502 5413-2305</div>
+  </div>
+  <div class="login-right">
+    <div style="margin-bottom:28px"><div class="wm" style="font-size:20px;color:#000">PLUS<span class="wm-dot">●</span>PLAN</div><div class="wm-sub" style="color:var(--G)">Sistema FODA Político</div></div>
+    <h3>Acceso al sistema</h3>
+    <p>Ingrese el código de acceso asignado por PlusPlan para iniciar el diagnóstico.</p>
+    <label class="field-lbl">Código de acceso</label>
+    <input id="code-inp" class="code-inp" placeholder="ALC-001" maxlength="20" autocomplete="off"/>
+    <div id="code-err" class="err-msg">Código inválido. Mínimo 4 caracteres.</div>
+    <button class="btn-Y" onclick="doLogin()">Ingresar al sistema →</button>
+    <div class="login-note">¿Sin código? Contacte a PlusPlan · +502 5413-2305</div>
+  </div>
+</div>
+
+<div id="form-screen" class="screen">
+  <div class="topbar"><div class="wm" style="font-size:16px;color:#fff">PLUS<span class="wm-dot">●</span>PLAN</div><span class="code-pill" id="form-badge">---</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:12%"></div></div>
+  <div id="sync-banner" class="sync-banner">✓ Guardado en Google Sheets</div>
+  <div class="form-body" id="form-body"></div>
+</div>
+
+<div id="admin-screen" class="screen">
+  <div class="topbar">
+    <div><div class="wm" style="font-size:16px;color:#fff">PLUS<span class="wm-dot">●</span>PLAN</div><div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:2px">Panel Admin</div></div>
+    <div style="display:flex;gap:8px"><button class="btn-sm" onclick="loadAdmin()">↻ Actualizar</button><button class="btn-sm" onclick="doLogout()">Salir</button></div>
+  </div>
+  <div class="admin-body">
+    <div id="gs-status-bar"></div>
+    <div class="admin-tabs"><button class="atab on" id="tab-c" onclick="swTab('c')">Candidatos</button><button class="atab" id="tab-g" onclick="swTab('g')">Generar código</button></div>
+    <div id="adm-c"></div>
+    <div id="adm-g" style="display:none"></div>
+  </div>
+</div>
+
+</div>
+<script>
+// ══════════════════════════════════════════════════════
+//  CONFIGURACIÓN — pegue aquí su URL de Google Apps Script
+// ══════════════════════════════════════════════════════
+const GS_URL = 'https://script.google.com/macros/s/AKfycbxJGc-EzpbAnVIuzXiLH-RAAfa5ssCF2a-9u3TrVTTrqat2e90DSEIcu0EmTaHTk8hT1A/exec';
+// Ejemplo: 'https://script.google.com/macros/s/AKfycb.../exec'
+
+const ADMIN_CODE = 'PLUS-ADM-K7X9-Q3';
+const SK = ['fortalezas','oportunidades','debilidades','amenazas'];
+let CC='', CS=0, lastCode='';
+let S = {respondent:{name:'',role:'candidato',email:''},profile:{name:'',type:'alcalde',municipality:'',party:'',age:''},foda:{},imagen:{},analysis:null};
+
+const FODA = {
+  fortalezas:{L:'F',label:'Fortalezas',c:'#1d9e75',bg:'#ecfdf5',tc:'#065f46',qs:[
+    {id:'f1',t:'¿Cuál es el principal logro del candidato en gestión pública o privada?',type:'ta'},
+    {id:'f2',t:'¿Qué lo diferencia claramente de otros candidatos?',type:'ta'},
+    {id:'f3',t:'¿Tiene reconocimiento comunitario? Descríbalo.',type:'ta'},
+    {id:'f4',t:'¿Cuenta con experiencia política o de gobierno previa?',type:'sel',opts:['Ninguna','1-2 años','3-5 años','Más de 5 años']},
+    {id:'f5',t:'¿Cuál es su propuesta bandera y por qué es viable?',type:'ta'},
+    {id:'f6',t:'Evalúe la fortaleza general del candidato',type:'slider'}]},
+  oportunidades:{L:'O',label:'Oportunidades',c:'#1d4ed8',bg:'#eff6ff',tc:'#1e40af',qs:[
+    {id:'o1',t:'¿Qué coyuntura política o social favorece esta candidatura?',type:'ta'},
+    {id:'o2',t:'¿Tiene alianzas estratégicas relevantes? Descríbalas.',type:'ta'},
+    {id:'o3',t:'¿Sus propuestas responden a demandas ciudadanas urgentes?',type:'ta'},
+    {id:'o4',t:'¿Identifica debilidades explotables en sus competidores?',type:'ta'},
+    {id:'o5',t:'Evalúe el nivel de oportunidades del contexto',type:'slider'}]},
+  debilidades:{L:'D',label:'Debilidades',c:'#b45309',bg:'#fffbeb',tc:'#92400e',qs:[
+    {id:'d1',t:'¿Existen antecedentes que puedan ser cuestionados públicamente?',type:'ta'},
+    {id:'d2',t:'¿En qué áreas reconoce falta de experiencia o conocimiento?',type:'ta'},
+    {id:'d3',t:'¿Tiene limitaciones de financiamiento o recursos?',type:'sel',opts:['Sin limitaciones','Menores','Moderadas','Severas']},
+    {id:'d4',t:'¿Qué aspectos de imagen pública necesitan mejora urgente?',type:'ta'},
+    {id:'d5',t:'Evalúe el peso de las debilidades internas',type:'slider'}]},
+  amenazas:{L:'A',label:'Amenazas',c:'#b91c1c',bg:'#fff1f2',tc:'#991b1b',qs:[
+    {id:'a1',t:'¿Quiénes son los principales competidores y qué ventajas tienen?',type:'ta'},
+    {id:'a2',t:'¿Hay factores externos que puedan afectar la campaña?',type:'ta'},
+    {id:'a3',t:'¿Existe riesgo de divisiones en el partido o coalición?',type:'sel',opts:['Sin riesgo','Bajo','Moderado','Alto']},
+    {id:'a4',t:'¿Circulan narrativas negativas sobre el candidato?',type:'ta'},
+    {id:'a5',t:'Evalúe la intensidad de las amenazas externas',type:'slider'}]}
+};
+
+const IMG_Q = [
+  {id:'ig1',t:'Seleccione las plataformas digitales activas',type:'mc',opts:['Facebook','Instagram','TikTok','X (Twitter)','YouTube','WhatsApp Broadcast','Telegram','LinkedIn']},
+  {id:'ig2',t:'Seguidores totales aproximados en todas las redes',type:'sel',opts:['Menos de 1,000','1,000 – 5,000','5,000 – 20,000','20,000 – 100,000','Más de 100,000']},
+  {id:'ig3',t:'¿Con qué frecuencia se publican contenidos?',type:'sel',opts:['Raramente','1-2 veces/semana','3-5 veces/semana','Diariamente','Varias veces al día']},
+  {id:'ig4',t:'¿El candidato tiene sitio web propio?',type:'yn'},
+  {id:'ig5',t:'¿Cuenta con equipo de comunicación digital?',type:'yn'},
+  {id:'ig6',t:'¿Ha realizado publicidad pagada en redes sociales?',type:'yn'},
+  {id:'ig7',t:'¿Tiene cobertura en medios digitales locales o nacionales?',type:'sel',opts:['Ninguna','Ocasional','Regular','Frecuente','Muy frecuente']},
+  {id:'ig8',t:'¿Tiene canal de YouTube o Podcast activo?',type:'yn'},
+  {id:'ig9',t:'Evalúe la coherencia y calidad del mensaje digital',type:'slider'},
+  {id:'ig10',t:'Evalúe la reputación digital percibida del candidato',type:'slider'}
+];
+
+// ── UTILS ──────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function sc(v){return v>=70?'#1d9e75':v>=50?'#b45309':'#b91c1c'}
+function gsReady(){return GS_URL && GS_URL!=='PEGAR_URL_AQUI'}
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+function calcDig(d){
+  if(!d)return 0; let s=0;
+  s+=Math.min((d.ig1||[]).length*4,20);
+  s+=({'Menos de 1,000':0,'1,000 – 5,000':5,'5,000 – 20,000':10,'20,000 – 100,000':13,'Más de 100,000':15}[d.ig2]||0);
+  s+=({'Raramente':0,'1-2 veces/semana':5,'3-5 veces/semana':10,'Diariamente':13,'Varias veces al día':15}[d.ig3]||0);
+  if(d.ig4==='si')s+=8;if(d.ig5==='si')s+=7;if(d.ig6==='si')s+=3;if(d.ig8==='si')s+=2;
+  s+=({'Ninguna':0,'Ocasional':2,'Regular':5,'Frecuente':8,'Muy frecuente':10}[d.ig7]||0);
+  s+=Math.round(((Number(d.ig9||5)+Number(d.ig10||5))/20)*20);
+  return Math.min(s,100);
+}
+
+function showScr(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id+'-screen').classList.add('active')}
+
+// ── SYNC BANNER ────────────────────────────────────────
+function showSync(ok){
+  const b=document.getElementById('sync-banner');
+  b.textContent = ok ? '✓ Guardado en Google Sheets' : '⚠ Guardado localmente (sin conexión a Sheets)';
+  b.className = 'sync-banner' + (ok?'':' err');
+  b.style.display='block';
+  setTimeout(()=>b.style.display='none', 2500);
+}
+
+// ── SAVE (Google Sheets + localStorage) ───────────────
+async function save(step){
+  const data = {code:CC, respondent:S.respondent, profile:S.profile, foda:S.foda, imagen:S.imagen, analysis:S.analysis, completedStep:step, lastSaved:new Date().toISOString()};
+  lsSet('resp:'+CC, data); // cache local siempre
+  if(gsReady()){
+    try{
+      await fetch(GS_URL, {method:'POST', body:JSON.stringify(data)});
+      showSync(true);
+    }catch(e){ showSync(false); }
+  }
+}
+
+// ── LOGIN ──────────────────────────────────────────────
+document.getElementById('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+async function doLogin(){
+  const v = document.getElementById('code-inp').value.trim().toUpperCase();
+  const err=document.getElementById('code-err'), inp=document.getElementById('code-inp');
+  err.style.display='none'; inp.classList.remove('err');
+  if(v.length<4){inp.classList.add('err');err.style.display='block';return}
+  CC=v;
+  if(v===ADMIN_CODE){showScr('admin');loadAdmin();return}
+
+  // Buscar datos existentes: primero Google Sheets, luego localStorage
+  let existing = null;
+  if(gsReady()){
+    try{
+      const res = await fetch(`${GS_URL}?action=get&code=${encodeURIComponent(v)}`);
+      const json = await res.json();
+      if(json.data) existing = sheetToState(json.data);
+    }catch(e){}
+  }
+  if(!existing) existing = lsGet('resp:'+v);
+
+  if(existing){
+    if(existing.respondent) S.respondent=existing.respondent;
+    if(existing.profile) S.profile=existing.profile;
+    if(existing.foda) S.foda=existing.foda;
+    if(existing.imagen) S.imagen=existing.imagen;
+    if(existing.analysis) S.analysis=existing.analysis;
+    CS = existing.completedStep||0;
+  }
+
+  document.getElementById('form-badge').textContent=v;
+  showScr('form'); renderStep(CS);
+}
+
+function doLogout(){
+  CC='';CS=0;
+  S={respondent:{name:'',role:'candidato',email:''},profile:{name:'',type:'alcalde',municipality:'',party:'',age:''},foda:{},imagen:{},analysis:null};
+  document.getElementById('code-inp').value='';
+  showScr('login');
+}
+
+// Convierte una fila del sheet al estado S
+function sheetToState(row){
+  return {
+    respondent:{name:row.Respondiente||'', email:row.Email||'', role:row.Rol||'candidato'},
+    profile:{name:row.Candidato||'', type:row.Tipo||'alcalde', municipality:row.Municipio||'', party:row.Partido||'', age:row.Edad||''},
+    foda: parseJ(row.FODA),
+    imagen: parseJ(row.Imagen),
+    analysis: parseJ(row.Analisis),
+    completedStep: parseInt(row.Paso)||0,
+    lastSaved: row.Fecha||''
+  };
+}
+function parseJ(v){try{if(!v||v==='null')return null;if(typeof v==='object')return v;return JSON.parse(v)}catch(e){return null}}
+
+// ── PROGRESS ───────────────────────────────────────────
+function setProg(s){document.getElementById('prog-fill').style.width=Math.round(((s+1)/8)*100)+'%'}
+
+function renderStep(s){
+  CS=s; setProg(s); window.scrollTo(0,0);
+  const b=document.getElementById('form-body');
+  if(s===0)b.innerHTML=rR();
+  else if(s===1)b.innerHTML=rP();
+  else if(s>=2&&s<=5)b.innerHTML=rFoda(s);
+  else if(s===6)b.innerHTML=rImg();
+  else b.innerHTML=S.analysis?rResults(S.analysis,calcDig(S.imagen)):rDone();
+}
+
+// ── STEP 0: Respondiente ───────────────────────────────
+function rR(){return`
+<div class="step-meta">Paso 1 de 8</div>
+<h2 class="step-title">¿Quién completa este diagnóstico?</h2>
+<p class="step-sub">Esta información quedará registrada junto al diagnóstico del candidato.</p>
+<div class="form-group"><label class="form-lbl">Nombre completo</label><input class="form-inp" id="rn" value="${esc(S.respondent.name)}" placeholder="Su nombre y apellidos"/></div>
+<div class="form-group"><label class="form-lbl">Correo electrónico</label><input class="form-inp" id="re" type="email" value="${esc(S.respondent.email)}" placeholder="correo@ejemplo.com"/></div>
+<div class="form-group"><label class="form-lbl">Rol</label>
+<select class="form-sel" id="rr">${[['El propio candidato','candidato'],['Gerente de campaña','gerente'],['Miembro del equipo','equipo'],['Consultor externo','consultor'],['Familiar o aliado','familiar'],['Otro','otro']].map(([l,v])=>`<option value="${v}" ${S.respondent.role===v?'selected':''}>${l}</option>`).join('')}</select></div>
+<div class="nav-row"><button class="btn-next" onclick="goR()">Continuar →</button></div>`}
+function goR(){const n=document.getElementById('rn').value.trim();if(!n)return alert('Ingrese su nombre.');S.respondent={name:n,email:document.getElementById('re').value.trim(),role:document.getElementById('rr').value};save(1);renderStep(1)}
+
+// ── STEP 1: Perfil ─────────────────────────────────────
+function rP(){const p=S.profile;return`
+<div class="step-meta">Paso 2 de 8</div>
+<h2 class="step-title">Perfil del candidato</h2>
+<p class="step-sub">Datos básicos de la persona a diagnosticar.</p>
+<div class="form-group"><label class="form-lbl">Nombre completo del candidato</label><input class="form-inp" id="pn" value="${esc(p.name)}" placeholder="Nombre y apellidos completos"/></div>
+<div class="grid-2">
+<div class="form-group"><label class="form-lbl">Tipo de candidatura</label><select class="form-sel" id="pt"><option value="alcalde" ${p.type==='alcalde'?'selected':''}>Alcalde Municipal</option><option value="diputado" ${p.type==='diputado'?'selected':''}>Diputado / Legislador</option></select></div>
+<div class="form-group"><label class="form-lbl">Edad</label><input class="form-inp" id="pa" type="number" min="18" max="99" value="${esc(p.age)}" placeholder="42"/></div></div>
+<div class="form-group"><label class="form-lbl">${p.type==='diputado'?'Distrito / Departamento':'Municipio'}</label><input class="form-inp" id="pm" value="${esc(p.municipality)}" placeholder="Nombre"/></div>
+<div class="form-group"><label class="form-lbl">Partido político</label><input class="form-inp" id="pp" value="${esc(p.party)}" placeholder="Nombre del partido"/></div>
+<div class="nav-row"><button class="btn-back" onclick="renderStep(0)">← Atrás</button><button class="btn-next" onclick="goP()">Fortalezas →</button></div>`}
+function goP(){const n=document.getElementById('pn').value.trim();if(!n)return alert('Ingrese el nombre del candidato.');S.profile={name:n,type:document.getElementById('pt').value,age:document.getElementById('pa').value,municipality:document.getElementById('pm').value.trim(),party:document.getElementById('pp').value.trim()};save(2);renderStep(2)}
+
+// ── STEPS 2-5: FODA ────────────────────────────────────
+function secKey(s){return SK[s-2]}
+function nextLbl(s){return s===5?'Imagen Digital →':FODA[SK[s-1]]?.label+' →'}
+function rFoda(s){const k=secKey(s),sec=FODA[k];return`
+<div class="step-meta">Paso ${s+1} de 8</div>
+<div class="foda-tag" style="background:${sec.bg};color:${sec.tc}"><span style="font-family:'Alatsi',sans-serif;font-size:18px">${sec.L}</span>${sec.label}</div>
+<h2 class="step-title">${sec.label}</h2>
+<p class="step-sub">Responda todas las preguntas con honestidad para un diagnóstico preciso.</p>
+${sec.qs.map((q,i)=>rQ(q,i,S.foda[q.id])).join('<div class="div-line"></div>')}
+<div class="nav-row"><button class="btn-back" onclick="savF(${s},${s-1})">← Atrás</button><button class="btn-next" onclick="savF(${s},${s+1})">${nextLbl(s)}</button></div>`}
+function savF(from,to){const k=secKey(from);FODA[k].qs.forEach(q=>{const el=document.getElementById('q-'+q.id);if(el)S.foda[q.id]=q.type==='slider'?parseInt(el.value):el.value});save(to);renderStep(to)}
+
+// ── STEP 6: Imagen Digital ─────────────────────────────
+function rImg(){return`
+<div class="step-meta">Paso 7 de 8</div>
+<div class="foda-tag" style="background:#f5f3ff;color:#4338ca">📱 Imagen Digital</div>
+<h2 class="step-title">Presencia digital</h2>
+<p class="step-sub">Evalúe la presencia y reputación digital del candidato en plataformas y medios.</p>
+${IMG_Q.map((q,i)=>rQ(q,i,S.imagen[q.id])).join('<div class="div-line"></div>')}
+<div class="nav-row"><button class="btn-back" onclick="savI(5)">← Atrás</button><button class="btn-ai" onclick="savIA()">✓ Finalizar diagnóstico</button></div>`}
+function savI(to){IMG_Q.forEach(q=>{const el=document.getElementById('q-'+q.id);if(el&&(q.type==='sel'||q.type==='ta'))S.imagen[q.id]=el.value;else if(el&&q.type==='slider')S.imagen[q.id]=parseInt(el.value)});save(to);renderStep(to)}
+async function savIA(){IMG_Q.forEach(q=>{const el=document.getElementById('q-'+q.id);if(el&&(q.type==='sel'||q.type==='ta'))S.imagen[q.id]=el.value;else if(el&&q.type==='slider')S.imagen[q.id]=parseInt(el.value)});await save(7);renderStep(7)}
+
+// ── QUESTION RENDERER ──────────────────────────────────
+function rQ(q,i,val){
+  const lbl=`<label class="form-lbl"><span class="qn">${String(i+1).padStart(2,'0')} —</span> ${q.t}</label>`;
+  if(q.type==='ta')return`<div class="form-group">${lbl}<textarea class="form-ta" id="q-${q.id}" placeholder="Escriba aquí...">${esc(val||'')}</textarea></div>`;
+  if(q.type==='sel')return`<div class="form-group">${lbl}<select class="form-sel" id="q-${q.id}"><option value="">Seleccione una opción</option>${q.opts.map(o=>`<option ${val===o?'selected':''} value="${o}">${o}</option>`).join('')}</select></div>`;
+  if(q.type==='slider'){const v=val||5;return`<div class="form-group">${lbl}<div><div class="slider-big" id="sv-${q.id}">${v}</div><div class="slider-sub"><span>1 — Muy bajo</span><span>10 — Excelente</span></div><input type="range" id="q-${q.id}" min="1" max="10" step="1" value="${v}" oninput="document.getElementById('sv-${q.id}').textContent=this.value"/></div></div>`}
+  if(q.type==='yn')return`<div class="form-group">${lbl}<div class="yn-wrap" id="yn-${q.id}"><button class="yn-btn${val==='si'?' yn-si':''}" onclick="setYN('${q.id}','si')">✓  Sí</button><button class="yn-btn${val==='no'?' yn-no':''}" onclick="setYN('${q.id}','no')">✗  No</button></div></div>`;
+  if(q.type==='mc'){const sel=val||[];return`<div class="form-group">${lbl}<div class="mc-grid">${q.opts.map(o=>`<button class="mc-btn${sel.includes(o)?' mc-on':''}" onclick="tMC('${q.id}','${o}',this)">${sel.includes(o)?'✓ ':''}${o}</button>`).join('')}</div></div>`}
+  return'';
+}
+function setYN(id,v){const w=document.getElementById('yn-'+id);w.children[0].className='yn-btn'+(v==='si'?' yn-si':'');w.children[1].className='yn-btn'+(v==='no'?' yn-no':'');S.imagen[id]=v}
+function tMC(id,opt,el){if(!S.imagen[id])S.imagen[id]=[];const arr=S.imagen[id],i=arr.indexOf(opt);if(i>=0){arr.splice(i,1);el.classList.remove('mc-on');el.textContent=opt}else{arr.push(opt);el.classList.add('mc-on');el.textContent='✓ '+opt}}
+
+// ── COMPLETION SCREEN (sin IA por ahora) ───────────────
+function rDone(){const p=S.profile;return`
+<div class="load-screen">
+  <div style="font-family:'Alatsi',sans-serif;font-size:40px;color:var(--K);margin-bottom:14px">✓</div>
+  <h2>Diagnóstico completado</h2>
+  <p style="margin-bottom:18px">Las respuestas de <strong>${esc(p.name||'el candidato')}</strong> quedaron registradas correctamente.</p>
+  <div class="final-box" style="text-align:left;max-width:360px;margin:0 auto 16px"><div class="final-lbl">Siguiente paso</div><p>El equipo de PlusPlan revisará la información y preparará el análisis estratégico FODA.</p></div>
+  <div class="powered">PLUSPLAN · plusplan.app · Guatemala · Código: ${esc(CC)}</div>
+</div>`}
+
+// ── AI ANALYSIS (diferido — reactivar moviendo la llamada al backend) ──
+function rLoad(){return`<div class="load-screen"><div class="spin"></div><h2>Analizando candidato...</h2><p>La IA está procesando el diagnóstico completo.<br>Por favor espere.</p></div>`}
+
+async function runAI(){
+  const ds=calcDig(S.imagen),p=S.profile,f=S.foda,img=S.imagen;
+  const bS=k=>FODA[k].qs.map(q=>`P: ${q.t}\nR: ${f[q.id]||'No respondido'}`).join('\n\n');
+  const prompt=`Eres un experto en consultoría política de PlusPlan (plusplan.app), firma guatemalteca de asesoría política y estratégica.\n\nCANDIDATO: ${p.name||'Sin nombre'} | CARGO: ${p.type==='alcalde'?'Alcalde Municipal':'Diputado'} | ${p.type==='alcalde'?'MUNICIPIO':'DISTRITO'}: ${p.municipality||'—'} | PARTIDO: ${p.party||'—'} | EDAD: ${p.age||'—'} | RESPONDIENTE: ${S.respondent.name} (${S.respondent.role})\n\nFORTALEZAS:\n${bS('fortalezas')}\nOPORTUNIDADES:\n${bS('oportunidades')}\nDEBILIDADES:\n${bS('debilidades')}\nAMENAZAS:\n${bS('amenazas')}\n\nIMAGEN DIGITAL: Plataformas: ${(img.ig1||[]).join(', ')||'Ninguna'} | Seguidores: ${img.ig2||'—'} | Frecuencia: ${img.ig3||'—'} | Web: ${img.ig4==='si'?'Sí':'No'} | Equipo: ${img.ig5==='si'?'Sí':'No'} | Ads: ${img.ig6==='si'?'Sí':'No'} | Medios: ${img.ig7||'—'} | YT/Pod: ${img.ig8==='si'?'Sí':'No'} | Calidad: ${img.ig9||5}/10 | Reputación: ${img.ig10||5}/10 | Score: ${ds}/100\n\nResponde SOLO JSON sin texto ni backticks:\n{"resumenEjecutivo":"2-3 oraciones","fortalezas":{"score":7,"analisis":"párrafo","puntos":["p1","p2","p3"]},"oportunidades":{"score":6,"analisis":"párrafo","puntos":["p1","p2","p3"]},"debilidades":{"score":5,"analisis":"párrafo","puntos":["p1","p2","p3"]},"amenazas":{"score":4,"analisis":"párrafo","puntos":["p1","p2","p3"]},"imagenDigital":{"diagnostico":"párrafo","recomendaciones":["r1","r2","r3"]},"recomendacionesEstrategicas":["r1","r2","r3"],"diagnosticoFinal":"párrafo conclusivo","viabilidad":65}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const text=(data.content||[]).map(b=>b.text||'').join('');
+    const result=JSON.parse(text.replace(/```json|```/g,'').trim());
+    S.analysis=result; await save(7);
+    document.getElementById('form-body').innerHTML=rResults(result,calcDig(S.imagen));
+  }catch(e){
+    document.getElementById('form-body').innerHTML=`<div class="load-screen"><p style="color:#dc2626;margin-bottom:16px">Error al generar el diagnóstico.</p><button class="btn-ai" style="max-width:200px;margin:0 auto" onclick="runAI()">↻ Reintentar</button></div>`;
+  }
+}
+
+// ── RESULTS ────────────────────────────────────────────
+function rResults(a,ds){
+  const p=S.profile, fb=Math.round(((a.fortalezas?.score||5)+(a.oportunidades?.score||5)+(10-(a.debilidades?.score||5))+(10-(a.amenazas?.score||5)))/4*10);
+  const SC={fortalezas:{L:'F',c:'#1d9e75',bg:'#ecfdf5',tc:'#065f46'},oportunidades:{L:'O',c:'#1d4ed8',bg:'#eff6ff',tc:'#1e40af'},debilidades:{L:'D',c:'#b45309',bg:'#fffbeb',tc:'#92400e'},amenazas:{L:'A',c:'#b91c1c',bg:'#fff1f2',tc:'#991b1b'}};
+  return`
+<div class="r-hero"><div class="r-hero-tag">PLUS<span style="color:var(--Y)">●</span>PLAN · Diagnóstico FODA</div><div class="r-hero-name">${esc(p.name||'Candidato')}</div><div class="r-hero-sub">${p.type==='alcalde'?'Alcalde Municipal':'Diputado'} · ${esc(p.municipality||'')} · ${esc(p.party||'')} · ${p.age||'—'} años</div></div>
+<div class="r-scores">${[{l:'Viabilidad',v:a.viabilidad||60},{l:'Imagen Digital',v:ds},{l:'Balance FODA',v:fb}].map(({l,v})=>`<div class="rs"><div class="rs-num" style="color:${sc(v)}">${v}</div><div class="rs-lbl">${l}</div></div>`).join('')}</div>
+<div class="exec-box">${esc(a.resumenEjecutivo||'')}</div>
+${SK.map(k=>{const c=SC[k],d=a[k];if(!d)return'';return`<div class="foda-card"><div class="foda-hdr" style="background:${c.bg}"><div class="f-badge" style="background:${c.c};color:#fff">${c.L}</div><span style="font-weight:700;font-size:12px;color:${c.tc};letter-spacing:.06em;text-transform:uppercase">${k.charAt(0).toUpperCase()+k.slice(1)}</span><span style="margin-left:auto;font-family:'Alatsi',sans-serif;font-size:18px;color:${c.c}">${d.score}/10</span></div><div class="foda-body"><p>${esc(d.analisis||'')}</p><ul class="foda-pts">${(d.puntos||[]).map(pt=>`<li>${esc(pt)}</li>`).join('')}</ul></div></div>`}).join('')}
+<div class="foda-card"><div class="foda-hdr" style="background:#f5f3ff"><div class="f-badge" style="background:#4338ca;color:#FFF200;font-size:14px">📱</div><span style="font-weight:700;font-size:12px;color:#4338ca;letter-spacing:.06em;text-transform:uppercase">Imagen Digital</span><span style="margin-left:auto;font-family:'Alatsi',sans-serif;font-size:18px;color:#4338ca">${ds}/100</span></div><div class="foda-body"><p>${esc(a.imagenDigital?.diagnostico||'')}</p><ul class="foda-pts">${(a.imagenDigital?.recomendaciones||[]).map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div></div>
+<div class="rec-card"><div class="rec-hdr">Recomendaciones estratégicas</div>${(a.recomendacionesEstrategicas||[]).map((r,i)=>`<div class="rec-item"><span class="rec-n">0${i+1}</span><p class="rec-t">${esc(r)}</p></div>`).join('')}</div>
+<div class="final-box"><div class="final-lbl">Diagnóstico final</div><p>${esc(a.diagnosticoFinal||'')}</p></div>
+<div class="powered">PLUSPLAN · plusplan.app · Guatemala · ${new Date().toLocaleDateString('es-GT')} · Código: ${esc(CC)}</div>`;
+}
+
+// ── ADMIN ──────────────────────────────────────────────
+async function loadAdmin(){
+  // Indicar estado de conexión con Google Sheets
+  const bar = document.getElementById('gs-status-bar');
+  bar.innerHTML = gsReady()
+    ? '<div class="gs-status gs-ok">✓ Conectado a Google Sheets — datos centralizados en tiempo real</div>'
+    : '<div class="gs-status gs-warn">⚠ Google Sheets no configurado — mostrando datos locales. Configure GS_URL para centralizar.</div>';
+
+  document.getElementById('adm-c').innerHTML='<div class="empty-st">Cargando candidatos...</div>';
+  let records = [];
+
+  if(gsReady()){
+    try{
+      const res = await fetch(`${GS_URL}?action=list`);
+      const json = await res.json();
+      if(json.data) records = json.data.map(row=>({key:'resp:'+row.Codigo, data:sheetToState(row), raw:row}));
+    }catch(e){ console.warn('GS error, using localStorage', e); }
+  }
+
+  // Fallback localStorage
+  if(!records.length){
+    const keys = Object.keys(localStorage).filter(k=>k.startsWith('resp:'));
+    records = keys.map(k=>({key:k, data:lsGet(k), raw:null})).filter(r=>r.data);
+  }
+
+  document.getElementById('adm-c').innerHTML = records.length===0
+    ? '<div class="empty-st">No hay candidatos registrados aún.</div>'
+    : records.map(({key,data,raw})=>{
+        const code=key.replace('resp:',''), p=data.profile||{}, a=data.analysis;
+        const ds = raw ? (parseInt(raw.DigitalScore)||calcDig(data.imagen)) : calcDig(data.imagen);
+        return`<div class="cand-card" onclick="adminView('${key}')">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="flex:1">
+              <div class="cand-name">${esc(p.name||'Sin nombre')}</div>
+              <div class="cand-meta">${p.type==='alcalde'?'Alcalde':'Diputado'} · ${esc(p.municipality||'—')} · ${esc(p.party||'—')}</div>
+              <div style="font-size:11px;color:var(--G);margin-bottom:10px">Código: <strong style="font-family:'Alatsi',sans-serif;letter-spacing:2px">${esc(code)}</strong> · ${esc(data.respondent?.name||'—')} · ${data.lastSaved||''}</div>
+            </div>
+            ${a?`<div style="text-align:right;margin-left:12px"><div style="font-family:'Alatsi',sans-serif;font-size:30px;color:${sc(a.viabilidad||60)}">${a.viabilidad||'—'}</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--G)">viabilidad</div></div>`:'<span class="pend-chip">Pendiente</span>'}
+          </div>
+          ${a?`<div class="mini-row">${SK.map((k2,i)=>{const cs=[{c:'#1d9e75',bg:'#ecfdf5'},{c:'#1d4ed8',bg:'#eff6ff'},{c:'#b45309',bg:'#fffbeb'},{c:'#b91c1c',bg:'#fff1f2'}][i];return`<span class="m-chip" style="background:${cs.bg};color:${cs.c}">${'FODA'[i]}: ${a[k2]?.score||'—'}</span>`}).join('')}<span class="m-chip" style="background:#f5f3ff;color:#4338ca">📱 ${ds}</span></div>`:''}</div>`;
+      }).join('');
+}
+
+// Caché temporal para admin view
+let adminCache = {};
+
+async function adminView(key){
+  document.getElementById('adm-c').innerHTML='<div class="empty-st">Cargando diagnóstico...</div>';
+  const code = key.replace('resp:','');
+  let data = null;
+
+  if(gsReady()){
+    try{
+      const res = await fetch(`${GS_URL}?action=get&code=${encodeURIComponent(code)}`);
+      const json = await res.json();
+      if(json.data) data = sheetToState(json.data);
+    }catch(e){}
+  }
+  if(!data) data = lsGet(key);
+  if(!data){document.getElementById('adm-c').innerHTML='<div class="empty-st">No se encontraron datos.</div>';return}
+
+  const ds = calcDig(data.imagen||{});
+  const sCC=CC, sS=S; CC=code; S=data;
+  const html = data.analysis ? rResults(data.analysis, ds) : '<div class="load-screen"><p>Este candidato aún no completó el diagnóstico IA.</p></div>';
+  S=sS; CC=sCC;
+
+  document.getElementById('adm-c').innerHTML=`
+    <button class="btn-sm-d" onclick="loadAdmin()" style="margin-bottom:20px">← Volver a lista</button>
+    <div style="font-size:11px;color:var(--G);background:var(--W);border:1px solid var(--L);padding:10px 14px;border-radius:2px;margin-bottom:16px">
+      Por: <strong>${esc(data.respondent?.name||'—')}</strong> (${esc(data.respondent?.role||'—')}) · ${data.lastSaved||''}
+    </div>${html}`;
+}
+
+function swTab(t){
+  document.getElementById('tab-c').classList.toggle('on',t==='c');
+  document.getElementById('tab-g').classList.toggle('on',t==='g');
+  document.getElementById('adm-c').style.display=t==='c'?'block':'none';
+  document.getElementById('adm-g').style.display=t==='g'?'block':'none';
+  if(t==='g') rCodeGen();
+}
+
+// ── CODE GENERATOR ─────────────────────────────────────
+async function rCodeGen(){
+  const cont=document.getElementById('adm-g');
+  cont.innerHTML='<div class="empty-st">Cargando códigos...</div>';
+  let codes = lsGet('genCodes')||[];
+  const resp = {};
+  if(gsReady()){
+    try{
+      const [cR,rR]=await Promise.all([fetch(`${GS_URL}?action=codes`),fetch(`${GS_URL}?action=list`)]);
+      const cJ=await cR.json(), rJ=await rR.json();
+      if(cJ.data) codes=cJ.data;
+      if(rJ.data) rJ.data.forEach(row=>{resp[row.Codigo]={done:(parseInt(row.Paso)||0)>=7};});
+    }catch(e){}
+  }else{
+    Object.keys(localStorage).filter(k=>k.startsWith('resp:')).forEach(k=>{
+      const d=lsGet(k); if(d) resp[k.replace('resp:','')]={done:(d.completedStep||0)>=7};
+    });
+  }
+  cont.innerHTML=`
+<div class="gen-box">
+  <h3>Generar código de acceso</h3>
+  <p>Cree un código único para compartir con el candidato o su equipo. Acceden al formulario de diagnóstico con ese código.</p>
+  <div class="grid-2">
+    <div class="form-group"><label class="form-lbl">Tipo</label><select class="form-sel" id="gtype"><option value="ALC">Alcalde (ALC)</option><option value="DIP">Diputado (DIP)</option></select></div>
+    <div class="form-group"><label class="form-lbl">Referencia (opcional)</label><input class="form-inp" id="gref" placeholder="nombre, municipio…" maxlength="10"/></div>
+  </div>
+  <button class="btn-Y" style="margin-top:0" onclick="genCode()">Generar código</button>
+  <div id="gen-result" class="gen-result">
+    <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;font-weight:700">Código generado — comparta por WhatsApp o correo</div>
+    <div class="gen-code-big" id="gen-disp">---</div>
+    <button class="copy-btn" onclick="copyCode()">Copiar código</button>
+    <span style="font-size:12px;color:rgba(255,255,255,.3)">hell@plusplan.app · +502 5413-2305</span>
+  </div>
+</div>
+${codes.length>0?`<div style="border:1px solid var(--L);border-radius:2px;overflow:hidden">
+<div class="ch-header"><span>Código</span><span>Tipo</span><span>Referencia</span><span>Estado</span></div>
+${codes.slice().reverse().map(c=>{const rd=resp[c.code]||{};return`<div class="ch-row"><span class="ch-code">${esc(c.code)}</span><span style="font-size:12px;color:var(--G)">${c.type==='ALC'?'Alcalde':'Diputado'}</span><span style="font-size:12px;color:var(--G)">${esc(c.ref||'—')}</span>${rd.done?'<span class="st-ok">Completado</span>':resp[c.code]?'<span class="st-pend">En proceso</span>':'<span class="st-pend">Pendiente</span>'}</div>`}).join('')}
+</div>`:'<div class="empty-st">Ningún código generado aún.</div>'}`;
+}
+
+async function genCode(){
+  const type=document.getElementById('gtype').value;
+  const ref=document.getElementById('gref').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
+  const r=()=>Math.random().toString(36).substring(2,4).toUpperCase();
+  const code=ref?`${type}-${ref}-${r()}`:`${type}-${r()}${r()}`;
+  lastCode=code;
+  document.getElementById('gen-result').style.display='block';
+  document.getElementById('gen-disp').textContent=code;
+  const entry={code,type,ref:ref||'',created:new Date().toISOString()};
+  const codes=lsGet('genCodes')||[];
+  codes.push(entry);
+  lsSet('genCodes',codes);
+  if(gsReady()){
+    try{ await fetch(GS_URL,{method:'POST',body:JSON.stringify({action:'saveCode',...entry})}); }catch(e){}
+  }
+}
+
+function copyCode(){
+  if(!lastCode)return;
+  navigator.clipboard.writeText(lastCode).then(()=>{
+    const b=document.querySelector('.copy-btn');b.textContent='✓ Copiado';
+    setTimeout(()=>b.textContent='Copiar código',2000);
+  }).catch(()=>{});
+}
+</script>
+</body>
+</html>
