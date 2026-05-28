@@ -446,6 +446,29 @@ ${SK.map(k=>{const c=SC[k],d=a[k];if(!d)return'';return`<div class="foda-card"><
 <div class="powered">PLUSPLAN · plusplan.app · Guatemala · ${new Date().toLocaleDateString('es-GT')} · Código: ${esc(CC)}</div>`;
 }
 
+// ── RAW ANSWERS (vista admin sin IA) ───────────────────
+function fmtAns(q,v){
+  if(v===undefined||v===null||v===''||(Array.isArray(v)&&!v.length))return '<em style="color:var(--G);font-size:12px">— sin respuesta —</em>';
+  if(q.type==='yn')return v==='si'?'<strong>Sí</strong>':'<strong>No</strong>';
+  if(q.type==='slider')return `<strong>${esc(String(v))}</strong> / 10`;
+  if(q.type==='mc')return Array.isArray(v)?esc(v.join(', ')):esc(String(v));
+  return esc(String(v));
+}
+function rRawAnswers(data,ds){
+  const p=data.profile||{}, f=data.foda||{}, im=data.imagen||{};
+  const step=data.completedStep||0;
+  const SC={fortalezas:{L:'F',c:'#1d9e75',bg:'#ecfdf5',tc:'#065f46'},oportunidades:{L:'O',c:'#1d4ed8',bg:'#eff6ff',tc:'#1e40af'},debilidades:{L:'D',c:'#b45309',bg:'#fffbeb',tc:'#92400e'},amenazas:{L:'A',c:'#b91c1c',bg:'#fff1f2',tc:'#991b1b'}};
+  const qRow=q=>`<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--G);letter-spacing:.04em;text-transform:uppercase;font-weight:700;margin-bottom:4px">${esc(q.t)}</div><div style="font-size:13px;line-height:1.55;color:#222">${fmtAns(q,(q.id[0]==='i'?im:f)[q.id])}</div></div>`;
+  const section=k=>{const sec=FODA[k],c=SC[k];return`<div class="foda-card"><div class="foda-hdr" style="background:${c.bg}"><div class="f-badge" style="background:${c.c};color:#fff">${c.L}</div><span style="font-weight:700;font-size:12px;color:${c.tc};letter-spacing:.06em;text-transform:uppercase">${sec.label}</span></div><div class="foda-body">${sec.qs.map(qRow).join('')}</div></div>`};
+  return`
+<div class="r-hero"><div class="r-hero-tag">PLUS<span style="color:var(--Y)">●</span>PLAN · Respuestas del candidato</div><div class="r-hero-name">${esc(p.name||'Candidato')}</div><div class="r-hero-sub">${p.type==='alcalde'?'Alcalde Municipal':'Diputado'} · ${esc(p.municipality||'—')} · ${esc(p.party||'—')} · ${p.age||'—'} años</div></div>
+<div class="r-scores"><div class="rs"><div class="rs-num" style="color:var(--G)">—</div><div class="rs-lbl">Viabilidad</div></div><div class="rs"><div class="rs-num" style="color:#4338ca">${ds}</div><div class="rs-lbl">Imagen Digital</div></div><div class="rs"><div class="rs-num">${step}/7</div><div class="rs-lbl">Avance</div></div></div>
+<div class="exec-box" style="border-left-color:var(--Y)">Diagnóstico con IA pendiente. A continuación las respuestas tal como las entregó el candidato.</div>
+${SK.map(section).join('')}
+<div class="foda-card"><div class="foda-hdr" style="background:#f5f3ff"><div class="f-badge" style="background:#4338ca;color:#FFF200;font-size:14px">📱</div><span style="font-weight:700;font-size:12px;color:#4338ca;letter-spacing:.06em;text-transform:uppercase">Imagen Digital</span><span style="margin-left:auto;font-family:'Alatsi',sans-serif;font-size:18px;color:#4338ca">${ds}/100</span></div><div class="foda-body">${IMG_Q.map(qRow).join('')}</div></div>
+<div class="powered">PLUSPLAN · plusplan.app · Código: ${esc(CC)}</div>`;
+}
+
 // ── ADMIN ──────────────────────────────────────────────
 async function loadAdmin(){
   // Indicar estado de conexión con Google Sheets
@@ -483,7 +506,7 @@ async function loadAdmin(){
               <div class="cand-meta">${p.type==='alcalde'?'Alcalde':'Diputado'} · ${esc(p.municipality||'—')} · ${esc(p.party||'—')}</div>
               <div style="font-size:11px;color:var(--G);margin-bottom:10px">Código: <strong style="font-family:'Alatsi',sans-serif;letter-spacing:2px">${esc(code)}</strong> · ${esc(data.respondent?.name||'—')} · ${data.lastSaved||''}</div>
             </div>
-            ${a?`<div style="text-align:right;margin-left:12px"><div style="font-family:'Alatsi',sans-serif;font-size:30px;color:${sc(a.viabilidad||60)}">${a.viabilidad||'—'}</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--G)">viabilidad</div></div>`:'<span class="pend-chip">Pendiente</span>'}
+            ${a?`<div style="text-align:right;margin-left:12px"><div style="font-family:'Alatsi',sans-serif;font-size:30px;color:${sc(a.viabilidad||60)}">${a.viabilidad||'—'}</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--G)">viabilidad</div></div>`:(((raw&&parseInt(raw.Paso))||data.completedStep||0)>=7?'<span class="pend-chip" style="background:#dcfce7;color:#166534">Completado</span>':'<span class="pend-chip">Pendiente</span>')}
           </div>
           ${a?`<div class="mini-row">${SK.map((k2,i)=>{const cs=[{c:'#1d9e75',bg:'#ecfdf5'},{c:'#1d4ed8',bg:'#eff6ff'},{c:'#b45309',bg:'#fffbeb'},{c:'#b91c1c',bg:'#fff1f2'}][i];return`<span class="m-chip" style="background:${cs.bg};color:${cs.c}">${'FODA'[i]}: ${a[k2]?.score||'—'}</span>`}).join('')}<span class="m-chip" style="background:#f5f3ff;color:#4338ca">📱 ${ds}</span></div>`:''}</div>`;
       }).join('');
@@ -509,7 +532,7 @@ async function adminView(key){
 
   const ds = calcDig(data.imagen||{});
   const sCC=CC, sS=S; CC=code; S=data;
-  const html = data.analysis ? rResults(data.analysis, ds) : '<div class="load-screen"><p>Este candidato aún no completó el diagnóstico IA.</p></div>';
+  const html = data.analysis ? rResults(data.analysis, ds) : rRawAnswers(data, ds);
   S=sS; CC=sCC;
 
   document.getElementById('adm-c').innerHTML=`
