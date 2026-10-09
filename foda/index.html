@@ -31,6 +31,8 @@ body{font-family:'League Spartan',sans-serif;background:var(--BG);color:var(--K)
 .btn-Y{width:100%;padding:15px;background:var(--Y);color:var(--K);border:none;border-radius:2px;font-family:'League Spartan',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:14px;transition:opacity .15s}
 .btn-Y:hover{opacity:.88}
 .login-note{font-size:11px;color:var(--G);text-align:center;margin-top:18px;letter-spacing:.03em}
+.admin-link{background:none;border:none;color:var(--G);font-family:inherit;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:10px;cursor:pointer;opacity:.6;text-decoration:underline}
+.btn-Y:disabled{opacity:.5;cursor:wait}
 .topbar{background:var(--K);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
 .code-pill{background:var(--Y);color:var(--K);font-size:10px;font-weight:700;letter-spacing:.1em;padding:4px 12px;border-radius:20px}
 .prog-bar{height:2px;background:rgba(255,255,255,.1)}
@@ -148,11 +150,12 @@ input[type=range]{width:100%;accent-color:var(--K);cursor:pointer}
     <div style="margin-bottom:28px"><div class="wm" style="font-size:20px;color:#000">PLUS<span class="wm-dot">●</span>PLAN</div><div class="wm-sub" style="color:var(--G)">Sistema FODA Político</div></div>
     <h3>Acceso al sistema</h3>
     <p>Ingrese el código de acceso asignado por PlusPlan para iniciar el diagnóstico.</p>
-    <label class="field-lbl">Código de acceso</label>
-    <input id="code-inp" class="code-inp" placeholder="ALC-001" maxlength="20" autocomplete="off"/>
+    <label class="field-lbl" id="code-lbl">Código de acceso</label>
+    <input id="code-inp" class="code-inp" placeholder="ALC-001" maxlength="32" autocomplete="off"/>
     <div id="code-err" class="err-msg">Código inválido. Mínimo 4 caracteres.</div>
-    <button class="btn-Y" onclick="doLogin()">Ingresar al sistema →</button>
+    <button class="btn-Y" id="login-btn" onclick="doLogin()">Ingresar al sistema →</button>
     <div class="login-note">¿Sin código? Contacte a PlusPlan · +502 5413-2305</div>
+    <button class="admin-link" id="admin-link" onclick="setAdminMode(!adminMode)">Acceso administrador</button>
   </div>
 </div>
 
@@ -183,8 +186,9 @@ input[type=range]{width:100%;accent-color:var(--K);cursor:pointer}
 // ══════════════════════════════════════════════════════
 const GS_URL = 'https://script.google.com/macros/s/AKfycbxJGc-EzpbAnVIuzXiLH-RAAfa5ssCF2a-9u3TrVTTrqat2e90DSEIcu0EmTaHTk8hT1A/exec';
 // Ejemplo: 'https://script.google.com/macros/s/AKfycb.../exec'
+// Backend: apps-script/Code.gs. La clave de admin vive solo en las Propiedades del script.
 
-const ADMIN_CODE = 'PLUS-ADM-K7X9-Q3';
+let ADMIN_KEY = '', adminMode = false;
 const SK = ['fortalezas','oportunidades','debilidades','amenazas'];
 let CC='', CS=0, lastCode='';
 let S = {respondent:{name:'',role:'candidato',email:''},profile:{name:'',type:'alcalde',municipality:'',party:'',age:''},foda:{},imagen:{},analysis:null};
@@ -259,14 +263,22 @@ function showSync(ok){
   setTimeout(()=>b.style.display='none', 2500);
 }
 
+// ── API (Google Apps Script, siempre POST) ─────────────
+// Sin Content-Type explícito el navegador envía text/plain y evita el preflight CORS.
+async function api(action, payload){
+  const res = await fetch(GS_URL, {method:'POST', body:JSON.stringify({action, ...payload})});
+  return res.json();
+}
+function adminApi(action, payload){ return api(action, {key:ADMIN_KEY, ...payload}); }
+
 // ── SAVE (Google Sheets + localStorage) ───────────────
 async function save(step){
   const data = {code:CC, respondent:S.respondent, profile:S.profile, foda:S.foda, imagen:S.imagen, analysis:S.analysis, completedStep:step, lastSaved:new Date().toISOString()};
   lsSet('resp:'+CC, data); // cache local siempre
   if(gsReady()){
     try{
-      await fetch(GS_URL, {method:'POST', body:JSON.stringify(data)});
-      showSync(true);
+      const json = await api('save', data);
+      showSync(!json.error);
     }catch(e){ showSync(false); }
   }
 }
@@ -274,23 +286,47 @@ async function save(step){
 // ── LOGIN ──────────────────────────────────────────────
 document.getElementById('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 
-async function doLogin(){
-  const v = document.getElementById('code-inp').value.trim().toUpperCase();
+const LOGIN_ERR = {
+  invalid_code:'Código no válido. Verifique el código asignado por PlusPlan.',
+  unauthorized:'Clave incorrecta.',
+  too_many_attempts:'Demasiados intentos fallidos. Espere unos minutos.',
+  admin_not_configured:'El acceso de administrador no está configurado en el servidor.',
+  network:'No se pudo conectar con el servidor. Intente de nuevo.'
+};
+function loginErr(msg){
   const err=document.getElementById('code-err'), inp=document.getElementById('code-inp');
-  err.style.display='none'; inp.classList.remove('err');
-  if(v.length<4){inp.classList.add('err');err.style.display='block';return}
-  CC=v;
-  if(v===ADMIN_CODE){showScr('admin');loadAdmin();return}
+  err.textContent=msg; err.style.display='block'; inp.classList.add('err');
+}
 
-  // Buscar datos existentes: primero Google Sheets, luego localStorage
-  let existing = null;
-  if(gsReady()){
-    try{
-      const res = await fetch(`${GS_URL}?action=get&code=${encodeURIComponent(v)}`);
-      const json = await res.json();
-      if(json.data) existing = sheetToState(json.data);
-    }catch(e){}
-  }
+function setAdminMode(on){
+  adminMode=on;
+  const inp=document.getElementById('code-inp');
+  inp.value=''; inp.type=on?'password':'text'; inp.placeholder=on?'••••••••':'ALC-001';
+  inp.maxLength=on?128:32; inp.style.textTransform=on?'none':'';
+  document.getElementById('code-lbl').textContent=on?'Clave de administrador':'Código de acceso';
+  document.getElementById('admin-link').textContent=on?'Acceso con código de candidato':'Acceso administrador';
+  document.getElementById('code-err').style.display='none'; inp.classList.remove('err');
+}
+
+async function doLogin(){
+  const inp=document.getElementById('code-inp'), btn=document.getElementById('login-btn');
+  document.getElementById('code-err').style.display='none'; inp.classList.remove('err');
+  const raw = inp.value.trim();
+  const v = adminMode ? raw : raw.toUpperCase();
+  if(v.length<4) return loginErr(adminMode?'Ingrese la clave.':'Código inválido. Mínimo 4 caracteres.');
+
+  btn.disabled=true;
+  let json;
+  try{ json = adminMode ? await api('adminCheck',{key:v}) : await api('login',{code:v}); }
+  catch(e){ json = {error:'network'}; }
+  btn.disabled=false;
+  if(json.error) return loginErr(LOGIN_ERR[json.error]||LOGIN_ERR.network);
+
+  if(adminMode){ ADMIN_KEY=v; inp.value=''; showScr('admin'); loadAdmin(); return }
+
+  CC=v;
+  // Datos existentes: primero Google Sheets, luego caché local de este dispositivo
+  let existing = json.data ? sheetToState(json.data) : null;
   if(!existing) existing = lsGet('resp:'+v);
 
   if(existing){
@@ -307,7 +343,7 @@ async function doLogin(){
 }
 
 function doLogout(){
-  CC='';CS=0;
+  CC='';CS=0;ADMIN_KEY='';setAdminMode(false);
   S={respondent:{name:'',role:'candidato',email:''},profile:{name:'',type:'alcalde',municipality:'',party:'',age:''},foda:{},imagen:{},analysis:null};
   document.getElementById('code-inp').value='';
   showScr('login');
@@ -436,10 +472,10 @@ function rResults(a,ds){
   const p=S.profile, fb=Math.round(((a.fortalezas?.score||5)+(a.oportunidades?.score||5)+(10-(a.debilidades?.score||5))+(10-(a.amenazas?.score||5)))/4*10);
   const SC={fortalezas:{L:'F',c:'#1d9e75',bg:'#ecfdf5',tc:'#065f46'},oportunidades:{L:'O',c:'#1d4ed8',bg:'#eff6ff',tc:'#1e40af'},debilidades:{L:'D',c:'#b45309',bg:'#fffbeb',tc:'#92400e'},amenazas:{L:'A',c:'#b91c1c',bg:'#fff1f2',tc:'#991b1b'}};
   return`
-<div class="r-hero"><div class="r-hero-tag">PLUS<span style="color:var(--Y)">●</span>PLAN · Diagnóstico FODA</div><div class="r-hero-name">${esc(p.name||'Candidato')}</div><div class="r-hero-sub">${p.type==='alcalde'?'Alcalde Municipal':'Diputado'} · ${esc(p.municipality||'')} · ${esc(p.party||'')} · ${p.age||'—'} años</div></div>
-<div class="r-scores">${[{l:'Viabilidad',v:a.viabilidad||60},{l:'Imagen Digital',v:ds},{l:'Balance FODA',v:fb}].map(({l,v})=>`<div class="rs"><div class="rs-num" style="color:${sc(v)}">${v}</div><div class="rs-lbl">${l}</div></div>`).join('')}</div>
+<div class="r-hero"><div class="r-hero-tag">PLUS<span style="color:var(--Y)">●</span>PLAN · Diagnóstico FODA</div><div class="r-hero-name">${esc(p.name||'Candidato')}</div><div class="r-hero-sub">${p.type==='alcalde'?'Alcalde Municipal':'Diputado'} · ${esc(p.municipality||'')} · ${esc(p.party||'')} · ${esc(p.age||'—')} años</div></div>
+<div class="r-scores">${[{l:'Viabilidad',v:Number(a.viabilidad)||60},{l:'Imagen Digital',v:ds},{l:'Balance FODA',v:fb}].map(({l,v})=>`<div class="rs"><div class="rs-num" style="color:${sc(v)}">${v}</div><div class="rs-lbl">${l}</div></div>`).join('')}</div>
 <div class="exec-box">${esc(a.resumenEjecutivo||'')}</div>
-${SK.map(k=>{const c=SC[k],d=a[k];if(!d)return'';return`<div class="foda-card"><div class="foda-hdr" style="background:${c.bg}"><div class="f-badge" style="background:${c.c};color:#fff">${c.L}</div><span style="font-weight:700;font-size:12px;color:${c.tc};letter-spacing:.06em;text-transform:uppercase">${k.charAt(0).toUpperCase()+k.slice(1)}</span><span style="margin-left:auto;font-family:'Alatsi',sans-serif;font-size:18px;color:${c.c}">${d.score}/10</span></div><div class="foda-body"><p>${esc(d.analisis||'')}</p><ul class="foda-pts">${(d.puntos||[]).map(pt=>`<li>${esc(pt)}</li>`).join('')}</ul></div></div>`}).join('')}
+${SK.map(k=>{const c=SC[k],d=a[k];if(!d)return'';return`<div class="foda-card"><div class="foda-hdr" style="background:${c.bg}"><div class="f-badge" style="background:${c.c};color:#fff">${c.L}</div><span style="font-weight:700;font-size:12px;color:${c.tc};letter-spacing:.06em;text-transform:uppercase">${k.charAt(0).toUpperCase()+k.slice(1)}</span><span style="margin-left:auto;font-family:'Alatsi',sans-serif;font-size:18px;color:${c.c}">${esc(d.score)}/10</span></div><div class="foda-body"><p>${esc(d.analisis||'')}</p><ul class="foda-pts">${(d.puntos||[]).map(pt=>`<li>${esc(pt)}</li>`).join('')}</ul></div></div>`}).join('')}
 <div class="foda-card"><div class="foda-hdr" style="background:#f5f3ff"><div class="f-badge" style="background:#4338ca;color:#FFF200;font-size:14px">📱</div><span style="font-weight:700;font-size:12px;color:#4338ca;letter-spacing:.06em;text-transform:uppercase">Imagen Digital</span><span style="margin-left:auto;font-family:'Alatsi',sans-serif;font-size:18px;color:#4338ca">${ds}/100</span></div><div class="foda-body"><p>${esc(a.imagenDigital?.diagnostico||'')}</p><ul class="foda-pts">${(a.imagenDigital?.recomendaciones||[]).map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div></div>
 <div class="rec-card"><div class="rec-hdr">Recomendaciones estratégicas</div>${(a.recomendacionesEstrategicas||[]).map((r,i)=>`<div class="rec-item"><span class="rec-n">0${i+1}</span><p class="rec-t">${esc(r)}</p></div>`).join('')}</div>
 <div class="final-box"><div class="final-lbl">Diagnóstico final</div><p>${esc(a.diagnosticoFinal||'')}</p></div>
@@ -461,8 +497,8 @@ function rRawAnswers(data,ds){
   const qRow=q=>`<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--G);letter-spacing:.04em;text-transform:uppercase;font-weight:700;margin-bottom:4px">${esc(q.t)}</div><div style="font-size:13px;line-height:1.55;color:#222">${fmtAns(q,(q.id[0]==='i'?im:f)[q.id])}</div></div>`;
   const section=k=>{const sec=FODA[k],c=SC[k];return`<div class="foda-card"><div class="foda-hdr" style="background:${c.bg}"><div class="f-badge" style="background:${c.c};color:#fff">${c.L}</div><span style="font-weight:700;font-size:12px;color:${c.tc};letter-spacing:.06em;text-transform:uppercase">${sec.label}</span></div><div class="foda-body">${sec.qs.map(qRow).join('')}</div></div>`};
   return`
-<div class="r-hero"><div class="r-hero-tag">PLUS<span style="color:var(--Y)">●</span>PLAN · Respuestas del candidato</div><div class="r-hero-name">${esc(p.name||'Candidato')}</div><div class="r-hero-sub">${p.type==='alcalde'?'Alcalde Municipal':'Diputado'} · ${esc(p.municipality||'—')} · ${esc(p.party||'—')} · ${p.age||'—'} años</div></div>
-<div class="r-scores"><div class="rs"><div class="rs-num" style="color:var(--G)">—</div><div class="rs-lbl">Viabilidad</div></div><div class="rs"><div class="rs-num" style="color:#4338ca">${ds}</div><div class="rs-lbl">Imagen Digital</div></div><div class="rs"><div class="rs-num">${step}/7</div><div class="rs-lbl">Avance</div></div></div>
+<div class="r-hero"><div class="r-hero-tag">PLUS<span style="color:var(--Y)">●</span>PLAN · Respuestas del candidato</div><div class="r-hero-name">${esc(p.name||'Candidato')}</div><div class="r-hero-sub">${p.type==='alcalde'?'Alcalde Municipal':'Diputado'} · ${esc(p.municipality||'—')} · ${esc(p.party||'—')} · ${esc(p.age||'—')} años</div></div>
+<div class="r-scores"><div class="rs"><div class="rs-num" style="color:var(--G)">—</div><div class="rs-lbl">Viabilidad</div></div><div class="rs"><div class="rs-num" style="color:#4338ca">${ds}</div><div class="rs-lbl">Imagen Digital</div></div><div class="rs"><div class="rs-num">${esc(step)}/7</div><div class="rs-lbl">Avance</div></div></div>
 <div class="exec-box" style="border-left-color:var(--Y)">Diagnóstico con IA pendiente. A continuación las respuestas tal como las entregó el candidato.</div>
 ${SK.map(section).join('')}
 <div class="foda-card"><div class="foda-hdr" style="background:#f5f3ff"><div class="f-badge" style="background:#4338ca;color:#FFF200;font-size:14px">📱</div><span style="font-weight:700;font-size:12px;color:#4338ca;letter-spacing:.06em;text-transform:uppercase">Imagen Digital</span><span style="margin-left:auto;font-family:'Alatsi',sans-serif;font-size:18px;color:#4338ca">${ds}/100</span></div><div class="foda-body">${IMG_Q.map(qRow).join('')}</div></div>
@@ -470,64 +506,49 @@ ${SK.map(section).join('')}
 }
 
 // ── ADMIN ──────────────────────────────────────────────
+// Si el servidor rechaza la clave (cambiada o expirada), vuelve al login.
+function adminFail(el, json){
+  if(json && json.error==='unauthorized'){ doLogout(); setAdminMode(true); loginErr('Sesión de administrador inválida. Ingrese la clave de nuevo.'); return }
+  document.getElementById(el).innerHTML='<div class="empty-st">No se pudo cargar la información del servidor. Use ↻ Actualizar.</div>';
+}
+
 async function loadAdmin(){
-  // Indicar estado de conexión con Google Sheets
   const bar = document.getElementById('gs-status-bar');
-  bar.innerHTML = gsReady()
-    ? '<div class="gs-status gs-ok">✓ Conectado a Google Sheets — datos centralizados en tiempo real</div>'
-    : '<div class="gs-status gs-warn">⚠ Google Sheets no configurado — mostrando datos locales. Configure GS_URL para centralizar.</div>';
-
   document.getElementById('adm-c').innerHTML='<div class="empty-st">Cargando candidatos...</div>';
-  let records = [];
 
-  if(gsReady()){
-    try{
-      const res = await fetch(`${GS_URL}?action=list`);
-      const json = await res.json();
-      if(json.data) records = json.data.map(row=>({key:'resp:'+row.Codigo, data:sheetToState(row), raw:row}));
-    }catch(e){ console.warn('GS error, using localStorage', e); }
+  let json;
+  try{ json = await adminApi('adminList'); }catch(e){ json = {error:'network'}; }
+  if(json.error){
+    bar.innerHTML = '<div class="gs-status gs-warn">⚠ Sin conexión con Google Sheets</div>';
+    return adminFail('adm-c', json);
   }
-
-  // Fallback localStorage
-  if(!records.length){
-    const keys = Object.keys(localStorage).filter(k=>k.startsWith('resp:'));
-    records = keys.map(k=>({key:k, data:lsGet(k), raw:null})).filter(r=>r.data);
-  }
+  bar.innerHTML = '<div class="gs-status gs-ok">✓ Conectado a Google Sheets — datos centralizados en tiempo real</div>';
+  const records = (json.data||[]).map(row=>({code:String(row.Codigo), data:sheetToState(row), raw:row}));
 
   document.getElementById('adm-c').innerHTML = records.length===0
     ? '<div class="empty-st">No hay candidatos registrados aún.</div>'
-    : records.map(({key,data,raw})=>{
-        const code=key.replace('resp:',''), p=data.profile||{}, a=data.analysis;
-        const ds = raw ? (parseInt(raw.DigitalScore)||calcDig(data.imagen)) : calcDig(data.imagen);
-        return`<div class="cand-card" onclick="adminView('${key}')">
+    : records.map(({code,data,raw})=>{
+        const p=data.profile||{}, a=data.analysis;
+        const ds = parseInt(raw.DigitalScore)||calcDig(data.imagen);
+        return`<div class="cand-card" data-code="${esc(code)}" onclick="adminView(this.dataset.code)">
           <div style="display:flex;justify-content:space-between;align-items:flex-start">
             <div style="flex:1">
               <div class="cand-name">${esc(p.name||'Sin nombre')}</div>
               <div class="cand-meta">${p.type==='alcalde'?'Alcalde':'Diputado'} · ${esc(p.municipality||'—')} · ${esc(p.party||'—')}</div>
-              <div style="font-size:11px;color:var(--G);margin-bottom:10px">Código: <strong style="font-family:'Alatsi',sans-serif;letter-spacing:2px">${esc(code)}</strong> · ${esc(data.respondent?.name||'—')} · ${data.lastSaved||''}</div>
+              <div style="font-size:11px;color:var(--G);margin-bottom:10px">Código: <strong style="font-family:'Alatsi',sans-serif;letter-spacing:2px">${esc(code)}</strong> · ${esc(data.respondent?.name||'—')} · ${esc(data.lastSaved)}</div>
             </div>
-            ${a?`<div style="text-align:right;margin-left:12px"><div style="font-family:'Alatsi',sans-serif;font-size:30px;color:${sc(a.viabilidad||60)}">${a.viabilidad||'—'}</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--G)">viabilidad</div></div>`:(((raw&&parseInt(raw.Paso))||data.completedStep||0)>=7?'<span class="pend-chip" style="background:#dcfce7;color:#166534">Completado</span>':'<span class="pend-chip">Pendiente</span>')}
+            ${a?`<div style="text-align:right;margin-left:12px"><div style="font-family:'Alatsi',sans-serif;font-size:30px;color:${sc(a.viabilidad||60)}">${esc(a.viabilidad||'—')}</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--G)">viabilidad</div></div>`:((parseInt(raw.Paso)||0)>=7?'<span class="pend-chip" style="background:#dcfce7;color:#166534">Completado</span>':'<span class="pend-chip">Pendiente</span>')}
           </div>
-          ${a?`<div class="mini-row">${SK.map((k2,i)=>{const cs=[{c:'#1d9e75',bg:'#ecfdf5'},{c:'#1d4ed8',bg:'#eff6ff'},{c:'#b45309',bg:'#fffbeb'},{c:'#b91c1c',bg:'#fff1f2'}][i];return`<span class="m-chip" style="background:${cs.bg};color:${cs.c}">${'FODA'[i]}: ${a[k2]?.score||'—'}</span>`}).join('')}<span class="m-chip" style="background:#f5f3ff;color:#4338ca">📱 ${ds}</span></div>`:''}</div>`;
+          ${a?`<div class="mini-row">${SK.map((k2,i)=>{const cs=[{c:'#1d9e75',bg:'#ecfdf5'},{c:'#1d4ed8',bg:'#eff6ff'},{c:'#b45309',bg:'#fffbeb'},{c:'#b91c1c',bg:'#fff1f2'}][i];return`<span class="m-chip" style="background:${cs.bg};color:${cs.c}">${'FODA'[i]}: ${esc(a[k2]?.score||'—')}</span>`}).join('')}<span class="m-chip" style="background:#f5f3ff;color:#4338ca">📱 ${ds}</span></div>`:''}</div>`;
       }).join('');
 }
 
-// Caché temporal para admin view
-let adminCache = {};
-
-async function adminView(key){
+async function adminView(code){
   document.getElementById('adm-c').innerHTML='<div class="empty-st">Cargando diagnóstico...</div>';
-  const code = key.replace('resp:','');
-  let data = null;
-
-  if(gsReady()){
-    try{
-      const res = await fetch(`${GS_URL}?action=get&code=${encodeURIComponent(code)}`);
-      const json = await res.json();
-      if(json.data) data = sheetToState(json.data);
-    }catch(e){}
-  }
-  if(!data) data = lsGet(key);
+  let json;
+  try{ json = await adminApi('adminGet',{code}); }catch(e){ json = {error:'network'}; }
+  if(json.error) return adminFail('adm-c', json);
+  const data = json.data ? sheetToState(json.data) : null;
   if(!data){document.getElementById('adm-c').innerHTML='<div class="empty-st">No se encontraron datos.</div>';return}
 
   const ds = calcDig(data.imagen||{});
@@ -538,7 +559,7 @@ async function adminView(key){
   document.getElementById('adm-c').innerHTML=`
     <button class="btn-sm-d" onclick="loadAdmin()" style="margin-bottom:20px">← Volver a lista</button>
     <div style="font-size:11px;color:var(--G);background:var(--W);border:1px solid var(--L);padding:10px 14px;border-radius:2px;margin-bottom:16px">
-      Por: <strong>${esc(data.respondent?.name||'—')}</strong> (${esc(data.respondent?.role||'—')}) · ${data.lastSaved||''}
+      Por: <strong>${esc(data.respondent?.name||'—')}</strong> (${esc(data.respondent?.role||'—')}) · ${esc(data.lastSaved)}
     </div>${html}`;
 }
 
@@ -554,20 +575,12 @@ function swTab(t){
 async function rCodeGen(){
   const cont=document.getElementById('adm-g');
   cont.innerHTML='<div class="empty-st">Cargando códigos...</div>';
-  let codes = lsGet('genCodes')||[];
-  const resp = {};
-  if(gsReady()){
-    try{
-      const [cR,rR]=await Promise.all([fetch(`${GS_URL}?action=codes`),fetch(`${GS_URL}?action=list`)]);
-      const cJ=await cR.json(), rJ=await rR.json();
-      if(cJ.data) codes=cJ.data;
-      if(rJ.data) rJ.data.forEach(row=>{resp[row.Codigo]={done:(parseInt(row.Paso)||0)>=7};});
-    }catch(e){}
-  }else{
-    Object.keys(localStorage).filter(k=>k.startsWith('resp:')).forEach(k=>{
-      const d=lsGet(k); if(d) resp[k.replace('resp:','')]={done:(d.completedStep||0)>=7};
-    });
-  }
+  let cJ, rJ;
+  try{ [cJ,rJ] = await Promise.all([adminApi('adminCodes'), adminApi('adminList')]); }
+  catch(e){ cJ = {error:'network'}; }
+  if(cJ.error || rJ.error) return adminFail('adm-g', cJ.error?cJ:rJ);
+  const codes = cJ.data||[], resp = {};
+  (rJ.data||[]).forEach(row=>{resp[row.Codigo]={done:(parseInt(row.Paso)||0)>=7};});
   cont.innerHTML=`
 <div class="gen-box">
   <h3>Generar código de acceso</h3>
@@ -590,21 +603,18 @@ ${codes.slice().reverse().map(c=>{const rd=resp[c.code]||{};return`<div class="c
 </div>`:'<div class="empty-st">Ningún código generado aún.</div>'}`;
 }
 
+// El código se genera en el servidor con aleatoriedad criptográfica (6 caracteres, ~10⁹ combinaciones).
 async function genCode(){
   const type=document.getElementById('gtype').value;
   const ref=document.getElementById('gref').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
-  const r=()=>Math.random().toString(36).substring(2,4).toUpperCase();
-  const code=ref?`${type}-${ref}-${r()}`:`${type}-${r()}${r()}`;
-  lastCode=code;
+  const disp=document.getElementById('gen-disp');
   document.getElementById('gen-result').style.display='block';
-  document.getElementById('gen-disp').textContent=code;
-  const entry={code,type,ref:ref||'',created:new Date().toISOString()};
-  const codes=lsGet('genCodes')||[];
-  codes.push(entry);
-  lsSet('genCodes',codes);
-  if(gsReady()){
-    try{ await fetch(GS_URL,{method:'POST',body:JSON.stringify({action:'saveCode',...entry})}); }catch(e){}
-  }
+  disp.textContent='Generando…';
+  let json;
+  try{ json = await adminApi('adminGenCode',{type,ref}); }catch(e){ json = {error:'network'}; }
+  if(json.error){ lastCode=''; if(json.error==='unauthorized') return adminFail('adm-g', json); disp.textContent='Error — intente de nuevo'; return }
+  lastCode=json.data.code;
+  disp.textContent=lastCode;
 }
 
 function copyCode(){
