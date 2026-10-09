@@ -24,8 +24,12 @@
  *   adminGenCode {key, type, ref}        → genera un código aleatorio en el servidor
  */
 
-const RESP_KEY_COL = 'Codigo';   // encabezado que identifica la hoja de respuestas
-const CODES_KEY_COL = 'code';    // encabezado que identifica la hoja de códigos
+const RESP_SHEET = 'Respuestas';
+const CODES_SHEET = 'Codigos';
+const RESP_HEADERS = ['Codigo', 'Respondiente', 'Email', 'Rol', 'Candidato', 'Tipo', 'Municipio', 'Partido', 'Edad',
+  'FODA', 'Imagen', 'Analisis', 'Viabilidad', 'DigitalScore', 'Paso', 'Fecha'];
+const CODES_HEADERS = ['Codigo', 'Tipo', 'Referencia', 'Creado'];
+const KEY_COL = 'Codigo';         // columna llave en ambas hojas
 const ROLES = ['candidato', 'gerente', 'equipo', 'consultor', 'familiar', 'otro'];
 const MAX_STR = 4000;
 const MAX_JSON = 40000;
@@ -51,8 +55,8 @@ function route_(req) {
     case 'save':         return candidateSave_(req);
     case 'adminCheck':   admin_(req); return { ok: true };
     case 'adminList':    admin_(req); return { data: readAll_(respSheet_()) };
-    case 'adminGet':     admin_(req); return { data: findRow_(respSheet_(), RESP_KEY_COL, normCode_(req.code)) };
-    case 'adminCodes':   admin_(req); return { data: readAll_(codesSheet_()) };
+    case 'adminGet':     admin_(req); return { data: findRow_(respSheet_(), KEY_COL, normCode_(req.code)) };
+    case 'adminCodes':   admin_(req); return { data: readAll_(codesSheet_()).map(codeOut_) };
     case 'adminGenCode': admin_(req); return { data: genCode_(req) };
     default:             throw fail_('unknown_action');
   }
@@ -63,7 +67,7 @@ function candidateLogin_(req) {
   throttle_('cand');
   const code = normCode_(req.code);
   if (!code || !codeExists_(code)) { recordFail_('cand'); throw fail_('invalid_code'); }
-  return { data: findRow_(respSheet_(), RESP_KEY_COL, code) };
+  return { data: findRow_(respSheet_(), KEY_COL, code) };
 }
 
 function candidateSave_(req) {
@@ -91,7 +95,7 @@ function candidateSave_(req) {
 
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
-  try { upsert_(respSheet_(), RESP_KEY_COL, values); }
+  try { upsert_(respSheet_(), KEY_COL, values); }
   finally { lock.releaseLock(); }
   return { ok: true };
 }
@@ -118,11 +122,10 @@ function genCode_(req) {
       code = [type, ref, rand_(6)].filter(Boolean).join('-');
       if (!codeExists_(code)) break;
     }
-    const entry = { code: code, type: type, ref: ref, created: new Date().toISOString() };
+    const row = { Codigo: code, Tipo: type, Referencia: ref, Creado: new Date().toISOString() };
     const sh = codesSheet_();
-    const headers = headers_(sh);
-    sh.appendRow(headers.map(h => guard_(entry[h] !== undefined ? entry[h] : '')));
-    return entry;
+    sh.appendRow(headers_(sh).map(h => guard_(row[h] !== undefined ? row[h] : '')));
+    return codeOut_(row);
   } finally { lock.releaseLock(); }
 }
 
@@ -132,13 +135,24 @@ function ss_() {
   return id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActiveSpreadsheet();
 }
 
-function sheetWithHeader_(name) {
-  const sh = ss_().getSheets().find(s => s.getLastColumn() > 0 && headers_(s).indexOf(name) >= 0);
-  if (!sh) throw fail_('sheet_missing');
+function sheet_(name, headers) {
+  const ss = ss_();
+  let sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+    sh.appendRow(headers);
+    sh.setFrozenRows(1);
+    sh.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  }
   return sh;
 }
-function respSheet_() { return sheetWithHeader_(RESP_KEY_COL); }
-function codesSheet_() { return sheetWithHeader_(CODES_KEY_COL); }
+function respSheet_() { return sheet_(RESP_SHEET, RESP_HEADERS); }
+function codesSheet_() { return sheet_(CODES_SHEET, CODES_HEADERS); }
+
+// La hoja guarda encabezados en español; el panel admin espera {code, type, ref, created}.
+function codeOut_(r) {
+  return { code: String(r.Codigo), type: r.Tipo, ref: r.Referencia, created: r.Creado };
+}
 
 function headers_(sh) {
   return sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
@@ -160,7 +174,7 @@ function findRow_(sh, col, code) {
 function codeExists_(code) {
   // Válido si fue generado por el admin, o si ya tiene un diagnóstico iniciado
   // (códigos anteriores a la sincronización con Sheets).
-  return !!(findRow_(codesSheet_(), CODES_KEY_COL, code) || findRow_(respSheet_(), RESP_KEY_COL, code));
+  return !!(findRow_(codesSheet_(), KEY_COL, code) || findRow_(respSheet_(), KEY_COL, code));
 }
 
 function upsert_(sh, keyCol, values) {
