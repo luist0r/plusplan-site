@@ -34,7 +34,11 @@ const ROLES = ['candidato', 'gerente', 'equipo', 'consultor', 'familiar', 'otro'
 const MAX_STR = 4000;
 const MAX_JSON = 40000;
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 32 símbolos, sin 0/O/1/I
-const FAIL_LIMIT = { admin: 10, cand: 40 };               // intentos fallidos por ventana
+// Intentos fallidos permitidos por ventana, compartidos por todos los visitantes.
+// Un límite bajo permitiría que cualquiera bloquee a los usuarios reales enviando
+// claves falsas; con códigos de 6 caracteres (~10⁹) y una clave de 28, 300 por ventana
+// sigue haciendo inviable adivinar por fuerza bruta.
+const FAIL_LIMIT = { admin: 300, cand: 300 };
 const FAIL_WINDOW_SEC = 900;
 
 // ── ENTRADA ─────────────────────────────────────────────
@@ -71,8 +75,10 @@ function candidateLogin_(req) {
 }
 
 function candidateSave_(req) {
+  // Mismo límite que el login: si no, "save" serviría para probar códigos sin restricción.
+  throttle_('cand');
   const code = normCode_(req.code);
-  if (!code || !codeExists_(code)) throw fail_('invalid_code');
+  if (!code || !codeExists_(code)) { recordFail_('cand'); throw fail_('invalid_code'); }
 
   const r = req.respondent || {}, p = req.profile || {};
   // Analisis y Viabilidad no se aceptan desde el navegador: los define PlusPlan.
