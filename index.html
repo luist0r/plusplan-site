@@ -5,39 +5,168 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://formspree.io; form-action https://formspree.io; base-uri 'self'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>PlusPlan | Asesoría política y estratégica en Guatemala</title>
-<meta name="description" content="Estrategia política con datos, narrativa y tecnología. Asesoramos a candidatos, gobiernos locales y organizaciones en Guatemala. Empieza con un diagnóstico FODA de tu candidatura.">
+<title>Asesoría política y estratégica en Guatemala | PlusPlan</title>
+<meta name="description" content="Consultora de asesoría política en Guatemala: estrategia, imagen pública y tecnología para candidatos a alcaldía y diputación, gobiernos locales y ONGs.">
 <link rel="canonical" href="https://plusplan.app/">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/assets/site.webmanifest">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PlusPlan">
 <meta property="og:locale" content="es_GT">
-<meta property="og:title" content="PlusPlan | Asesoría política y estratégica en Guatemala">
-<meta property="og:description" content="Estrategia política con datos, narrativa y tecnología. Empieza con un diagnóstico FODA de tu candidatura.">
+<meta property="og:title" content="Asesoría política y estratégica en Guatemala | PlusPlan">
+<meta property="og:description" content="Estrategia, imagen pública y tecnología para candidatos, gobiernos locales y organizaciones en Guatemala. Empieza con un diagnóstico FODA.">
 <meta property="og:url" content="https://plusplan.app/">
 <meta property="og:image" content="https://plusplan.app/assets/og-plusplan.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="PlusPlan: estrategia política con datos, narrativa y tecnología">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PlusPlan | Asesoría política y estratégica en Guatemala">
-<meta name="twitter:description" content="Estrategia política con datos, narrativa y tecnología. Empieza con un diagnóstico FODA de tu candidatura.">
+<meta name="twitter:title" content="Asesoría política y estratégica en Guatemala | PlusPlan">
+<meta name="twitter:description" content="Estrategia, imagen pública y tecnología para candidatos, gobiernos locales y organizaciones en Guatemala. Empieza con un diagnóstico FODA.">
 <meta name="twitter:image" content="https://plusplan.app/assets/og-plusplan.png">
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "name": "PlusPlan",
-  "url": "https://plusplan.app/",
-  "description": "Asesoría política y estratégica con visión tecnológica para candidatos, gobiernos locales y organizaciones.",
-  "areaServed": {"@type": "Country", "name": "Guatemala"},
-  "address": {"@type": "PostalAddress", "addressCountry": "GT"},
-  "telephone": "+502 5413-2305",
-  "email": "hell@plusplan.app",
-  "knowsAbout": ["Estrategia política", "Imagen pública", "Comunicación política", "Inteligencia artificial para gobiernos"]
+  "@graph": [
+    {
+      "@type": "ProfessionalService",
+      "@id": "https://plusplan.app/#org",
+      "name": "PlusPlan",
+      "url": "https://plusplan.app/",
+      "description": "Consultora de asesoría política y estratégica con visión tecnológica para candidatos, gobiernos locales y organizaciones en Guatemala.",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://plusplan.app/assets/logo-plusplan.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://plusplan.app/assets/og-plusplan.png",
+      "email": "hell@plusplan.app",
+      "telephone": "+502 5413-2305",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "GT"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Guatemala"
+      },
+      "knowsAbout": [
+        "Asesoría política",
+        "Estrategia electoral",
+        "Imagen pública",
+        "Comunicación política",
+        "Análisis FODA",
+        "Inteligencia artificial para gobiernos"
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Servicios de PlusPlan",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Asesoría política para candidatos",
+              "url": "https://plusplan.app/asesoria-politica-candidatos/"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Diagnóstico FODA para candidatos",
+              "url": "https://plusplan.app/diagnostico-foda/"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Tecnología e inteligencia artificial para gobiernos locales",
+              "url": "https://plusplan.app/tecnologia-gobiernos-locales/"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Course",
+              "name": "Campaign Boot Camp",
+              "url": "https://plusplan.app/campaign-boot-camp/"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://plusplan.app/#website",
+      "url": "https://plusplan.app/",
+      "name": "PlusPlan",
+      "inLanguage": "es",
+      "publisher": {
+        "@id": "https://plusplan.app/#org"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://plusplan.app/#preguntas",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Qué hace PlusPlan?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PlusPlan es una consultora de asesoría política y estratégica en Guatemala. Trabajamos con candidatos a alcaldía y diputación, gobiernos locales y organizaciones, combinando estrategia, comunicación y tecnología."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué es el diagnóstico FODA para candidatos?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Es una evaluación de las fortalezas, oportunidades, debilidades y amenazas de tu candidatura, más tu imagen digital, con un puntaje de presencia digital de 0 a 100. Lo completas desde el celular con un código y el equipo de PlusPlan te entrega el análisis."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo obtengo un código para el diagnóstico?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Escríbenos por WhatsApp al +502 5413-2305. El código es único para tu candidatura y te permite completar el diagnóstico en varias sesiones."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Trabajan con municipalidades e instituciones?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. Desarrollamos automatización de tareas, chatbots de atención ciudadana, dashboards de gestión e integración de sistemas para municipalidades, instituciones públicas y ONGs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué es el Campaign Boot Camp?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un programa intensivo y práctico de formación política en cuatro módulos, basado en la visión de Cristina Pelosi: fundamentos estratégicos, comunicación de impacto, tecnología para campañas y liderazgo y acción."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué es la Misión Argentina?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un programa de cinco días en Buenos Aires para conocer cómo se gestionan las ciudades inteligentes: gestión urbana, industria, networking tecnológico y un taller de replicabilidad."
+          }
+        }
+      ]
+    }
+  ]
 }
 </script>
 
@@ -79,7 +208,7 @@
     <div>
       <span class="eyebrow tag">Rumbo a las Elecciones Generales 2027</span>
       <h1 id="h1">Estrategia política con <mark>datos, narrativa</mark> y tecnología.</h1>
-      <p class="lead">Asesoramos a candidatos, gobiernos locales y organizaciones en Guatemala. Empezamos con un diagnóstico FODA de tu candidatura y construimos el plan desde ahí.</p>
+      <p class="lead">Somos una consultora de asesoría política y estratégica en Guatemala. Trabajamos con candidatos a alcaldía y diputación, gobiernos locales y organizaciones. Empezamos con un diagnóstico FODA de tu candidatura y construimos el plan desde ahí.</p>
       <div class="cta">
         <a class="btn solid" href="https://wa.me/50254132305?text=Hola%2C%20quiero%20solicitar%20un%20diagn%C3%B3stico%20para%20mi%20candidatura." target="_blank" rel="noopener">Solicitar diagnóstico</a>
         <a class="btn" href="#servicios">Ver servicios</a>
@@ -120,7 +249,7 @@
     <div class="row">
       <div>
         <h3>Candidaturas</h3>
-        <p class="what">Posicionamos tu nombre, historia y visión para que te escuchen y crean.</p>
+        <p class="what">Para candidatos a alcaldía y diputación: posicionamos tu nombre, tu historia y tu visión para que te escuchen y te crean.</p>
       </div>
       <div class="detail">
         <ul>
@@ -130,14 +259,14 @@
           <li>Estrategia de redes y medios</li>
           <li>Análisis de opinión pública</li>
         </ul>
-        <a class="go" href="#foda">Empezar con el diagnóstico →</a>
+        <div class="go-row"><a class="go" href="/asesoria-politica-candidatos/">Ver asesoría para candidatos →</a><a class="go" href="/diagnostico-foda/">Diagnóstico FODA →</a></div>
       </div>
     </div>
 
     <div class="row">
       <div>
         <h3>Gobiernos e instituciones</h3>
-        <p class="what">Potenciamos tu gestión con inteligencia artificial y software a la medida.</p>
+        <p class="what">Para municipalidades, instituciones públicas y ONGs: inteligencia artificial y software a la medida para atender mejor y gestionar con datos.</p>
       </div>
       <div class="detail">
         <ul>
@@ -146,7 +275,7 @@
           <li>Dashboards de gestión</li>
           <li>Integración de sistemas</li>
         </ul>
-        <a class="go" href="#contacto">Hablar con el equipo →</a>
+        <div class="go-row"><a class="go" href="/tecnologia-gobiernos-locales/">Ver tecnología para gobiernos →</a><a class="go" href="#contacto">Hablar con el equipo →</a></div>
       </div>
     </div>
 
@@ -162,7 +291,7 @@
           <li>Tecnología para campañas</li>
           <li>Liderazgo y acción</li>
         </ul>
-        <a class="go" href="#bootcamp">Ver el programa →</a>
+        <a class="go" href="/campaign-boot-camp/">Ver el programa →</a>
       </div>
     </div>
   </div>
@@ -177,7 +306,7 @@
       <div class="cta tight">
         <a class="btn solid" href="https://wa.me/50254132305?text=Hola%2C%20quiero%20mi%20c%C3%B3digo%20para%20el%20diagn%C3%B3stico%20FODA." target="_blank" rel="noopener">Solicitar mi código</a>
       </div>
-      <p class="have">¿Ya tienes un código? <a href="/foda/">Entrar al diagnóstico →</a></p>
+      <p class="have">¿Ya tienes un código? <a href="/foda/">Entrar al diagnóstico →</a><br><a href="/diagnostico-foda/">Qué evalúa y cómo funciona →</a></p>
     </div>
     <ol class="steps">
       <li><div><b>Pides tu código</b><span>Por WhatsApp. Es único para tu candidatura.</span></div></li>
@@ -215,7 +344,7 @@
       <div class="cta tight">
         <a class="btn solid" href="https://wa.me/50254132305?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20el%20Campaign%20Boot%20Camp." target="_blank" rel="noopener">Pedir información</a>
       </div>
-      <p class="by">Fechas y modalidad: escríbenos y te las confirmamos.</p>
+      <p class="by">Fechas y modalidad: escríbenos y te las confirmamos. <a class="go" href="/campaign-boot-camp/">Ver el programa completo →</a></p>
     </div>
     <ol class="mods">
       <li><div><b>Fundamentos estratégicos</b><span>Una visión clara y una narrativa auténtica.</span></div></li>
@@ -238,6 +367,41 @@
       <li>Taller de replicabilidad</li>
     </ul>
     <div class="cta"><a class="btn dark" href="/mision-argentina/">Ver la misión</a></div>
+  </div>
+</section>
+
+<section class="sec light" id="preguntas" aria-labelledby="h-faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Preguntas frecuentes</span>
+      <h2 class="serif" id="h-faq">Lo que más nos preguntan.</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>¿Qué hace PlusPlan?</summary>
+        <p>PlusPlan es una consultora de asesoría política y estratégica en Guatemala. Trabajamos con candidatos a alcaldía y diputación, gobiernos locales y organizaciones, combinando estrategia, comunicación y tecnología.</p>
+      </details>
+      <details>
+        <summary>¿Qué es el diagnóstico FODA para candidatos?</summary>
+        <p>Es una evaluación de las fortalezas, oportunidades, debilidades y amenazas de tu candidatura, más tu imagen digital, con un puntaje de presencia digital de 0 a 100. Lo completas desde el celular con un código y el equipo de PlusPlan te entrega el análisis. <a href="/diagnostico-foda/">Ver cómo funciona →</a></p>
+      </details>
+      <details>
+        <summary>¿Cómo obtengo un código para el diagnóstico?</summary>
+        <p>Escríbenos por WhatsApp al +502 5413-2305. El código es único para tu candidatura y te permite completar el diagnóstico en varias sesiones.</p>
+      </details>
+      <details>
+        <summary>¿Trabajan con municipalidades e instituciones?</summary>
+        <p>Sí. Desarrollamos automatización de tareas, chatbots de atención ciudadana, dashboards de gestión e integración de sistemas para municipalidades, instituciones públicas y ONGs. <a href="/tecnologia-gobiernos-locales/">Ver tecnología para gobiernos →</a></p>
+      </details>
+      <details>
+        <summary>¿Qué es el Campaign Boot Camp?</summary>
+        <p>Un programa intensivo y práctico de formación política en cuatro módulos, basado en la visión de Cristina Pelosi: fundamentos estratégicos, comunicación de impacto, tecnología para campañas y liderazgo y acción. <a href="/campaign-boot-camp/">Ver el programa →</a></p>
+      </details>
+      <details>
+        <summary>¿Qué es la Misión Argentina?</summary>
+        <p>Un programa de cinco días en Buenos Aires para conocer cómo se gestionan las ciudades inteligentes: gestión urbana, industria, networking tecnológico y un taller de replicabilidad. <a href="/mision-argentina/">Ver la misión →</a></p>
+      </details>
+    </div>
   </div>
 </section>
 
@@ -281,14 +445,15 @@
   <div class="wrap">
     <a class="logo" href="/" aria-label="PlusPlan, inicio">PLUS<i>●</i>PLAN</a>
     <nav aria-label="Pie de página">
-      <a href="#servicios">Servicios</a>
-      <a href="#metodo">Método</a>
-      <a href="#bootcamp">Boot Camp</a>
-      <a href="/foda/">Diagnóstico FODA</a>
+      <a href="/asesoria-politica-candidatos/">Asesoría a candidatos</a>
+      <a href="/tecnologia-gobiernos-locales/">Tecnología para gobiernos</a>
+      <a href="/campaign-boot-camp/">Campaign Boot Camp</a>
+      <a href="/diagnostico-foda/">Diagnóstico FODA</a>
       <a href="/mision-argentina/">Misión Argentina</a>
+      <a href="#preguntas">Preguntas frecuentes</a>
       <a href="/privacidad/">Privacidad</a>
     </nav>
-    <small>© 2026 PlusPlan · Guatemala<br><a href="mailto:hell@plusplan.app">hell@plusplan.app</a> · <a href="tel:+50254132305">+502 5413-2305</a></small>
+    <small>© 2026 PlusPlan · Asesoría política y estratégica · Guatemala<br><a href="mailto:hell@plusplan.app">hell@plusplan.app</a> · <a href="tel:+50254132305">+502 5413-2305</a></small>
   </div>
 </footer>
 

@@ -205,3 +205,44 @@ textarea{min-height:140px;resize:vertical}
 .lost h1{font:400 clamp(3rem,14vw,8rem)/.9 var(--f-display);text-transform:uppercase}
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}.btn:hover{transform:none}}
+
+/* ── Páginas de servicio (SEO) ── */
+.crumbs{background:var(--ink);padding:14px var(--gutter) 0;font-size:.82rem;color:var(--grey)}
+.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;max-width:var(--max);margin-inline:auto}
+.crumbs li+li::before{content:"/";margin-right:6px;color:#55565A}
+.crumbs a{color:#D5D6D9;text-underline-offset:3px}
+.page-hero{background:var(--ink);padding-block:36px 64px}
+.page-hero .wrap{display:grid;gap:22px}
+.page-hero h1{font:400 clamp(2.1rem,7.4vw,4.4rem)/.98 var(--f-display);text-transform:uppercase;text-wrap:balance;max-width:18ch}
+.page-hero .lead{max-width:56ch;color:#D5D6D9;font-size:1.12rem}
+.prose{display:grid;gap:16px;max-width:68ch}
+.prose h2{font:600 clamp(1.6rem,4.4vw,2.3rem)/1.1 var(--f-serif);letter-spacing:-.01em;margin-top:22px;text-wrap:balance}
+.prose h3{font:400 1.35rem/1.1 var(--f-display);text-transform:uppercase;margin-top:10px}
+.prose p{color:#26272B}
+.prose ul{display:grid;gap:8px}
+.prose li{display:flex;gap:10px;align-items:baseline}
+.prose li::before{content:"";flex:none;width:9px;height:9px;background:var(--ink);transform:translateY(-1px)}
+.prose a{text-underline-offset:4px;text-decoration-color:var(--yellow);text-decoration-thickness:3px;font-weight:500}
+.cols2{display:grid;gap:40px}
+@media (min-width:960px){.cols2{grid-template-columns:1.4fr .8fr;gap:72px;align-items:start}}
+.aside-box{background:var(--ink);color:var(--white);padding:24px;border-radius:2px;display:grid;gap:14px}
+.aside-box h2{font:400 1.6rem/1.05 var(--f-display);text-transform:uppercase}
+.aside-box p{color:#D5D6D9}
+.related{display:grid;gap:10px;margin-top:8px}
+.related a{display:block;padding:14px 0;border-top:1px solid var(--rule);font-weight:700;text-decoration:none}
+.related a:hover{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px}
+
+/* Preguntas frecuentes */
+.faq{display:grid;max-width:820px}
+.faq details{border-top:2px solid var(--ink)}
+.faq details:last-child{border-bottom:2px solid var(--ink)}
+.faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding-block:18px;font:600 1.15rem/1.3 var(--f-serif)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font:400 1.6rem/1 var(--f-display);flex:none}
+.faq details[open] summary::after{content:"–"}
+.faq details p{padding-bottom:18px;color:#26272B;max-width:64ch}
+.faq details a{text-underline-offset:4px;text-decoration-color:var(--yellow);text-decoration-thickness:3px;font-weight:500}
+.go-row{display:flex;flex-wrap:wrap;gap:8px 24px}
+.light .aside-box :focus-visible{outline-color:var(--yellow)}
+.aside-box .go{color:var(--yellow)}
+.contact{border-top:1px solid var(--rule)}
