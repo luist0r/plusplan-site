@@ -287,3 +287,14 @@ textarea{min-height:140px;resize:vertical}
 @media (min-width:900px){.people{grid-template-columns:1fr 1fr;gap:72px}}
 .tagline{color:var(--grey);font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem}
 .camp .wrap.block{display:block}
+
+/* Fundador */
+.facts{display:grid}
+.facts li{display:grid;grid-template-columns:14px 1fr;gap:14px;padding-block:18px;border-top:1px solid #2F2F34}
+.facts li:last-child{border-bottom:1px solid #2F2F34}
+.facts li::before{content:"";width:10px;height:10px;background:var(--yellow);margin-top:7px}
+.facts b{display:block;font-weight:700;font-size:1.05rem}
+.facts span{color:var(--grey)}
+.person h3 a{text-decoration:none}
+.person h3 a:hover{text-decoration:underline;text-decoration-thickness:3px}
+.foot small a.founder{color:#D5D6D9}
